@@ -1,0 +1,1 @@
+Edit the variables in api/daemon.js

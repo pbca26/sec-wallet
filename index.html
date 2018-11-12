@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <title>SEC Wallet</title>
+  </head>
+  <body>
+    <!-- NAV-BAR -->
+    <nav class="navbar navbar-expand navbar-dark bg-dark">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+        
+      <a class="navbar-brand" href="#">
+          <img src="img/sec_logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
+          SEC Wallet
+      </a>
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a id="nav-wallet" class="nav-link" href="#">Wallet</a>
+        </li>
+        <li class="nav-item">
+          <a id="nav-tokens" class="nav-link" href="#">Tokens</a>
+        </li>
+      </ul>
+
+      <form class="form-inline my-2 my-lg-0">
+        <div class="btn-group">
+          <button id="button-change-pubkey" type="button" class="btn btn-primary my-2 my-sm-0" data-toggle="modal" data-target="#modal-change-pubkey">Change Public key</button>
+          <button id="button-show-keys" type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#modal-show-keys">Show keys</button>  
+        </div>
+      </form>
+    </nav>
+
+
+
+
+    <main>
+      <!-- TOKENS -->
+      <div id="tokens-page-only">
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <label class="input-group-text" for="select-tokens">Token</label>
+            </div>
+            <select class="custom-select" id="select-tokens"></select>
+            <div class="input-group-append">
+              <button id="button-token-create" type="button" class="btn btn-secondary my-2 my-sm-0" data-toggle="modal" data-target="#modal-create-token">Create</button>  
+            </div>
+
+            <small class="form-text text-muted">
+              After sending token, amount will appear as '0' until the transaction is <strong>validated.</strong> Please wait until it's <strong>refreshed</strong>.
+            </small>
+          </div>
+
+        <hr>
+
+        <form>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Address</span>
+              </div>
+              <input id="input-token-address" class="form-control" placeholder="Enter the address of recipient">
+            </div>
+  
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Amount</span>
+              </div>
+              <input id="input-token-amount" type="number" min="0" class="form-control" placeholder="Enter the amount you'll send">
+            </div>
+              
+            <button id="button-token-send" class="btn btn-primary">Send</button>
+          </form>
+      </div>
+
+
+
+
+      <!-- WALLET -->
+      <div id="wallet-page-only">
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text">Balance</span>
+          </div>
+          <input id="balance" class="form-control" placeholder="Loading the amount..." disabled>
+        </div>
+        
+        <hr>
+        
+        <form>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Address</span>
+            </div>
+            <input id="input-address" class="form-control" placeholder="Enter the address of recipient">
+          </div>
+
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Amount</span>
+            </div>
+            <input id="input-amount" type="number" min="0" class="form-control" placeholder="Enter the amount you'll send">
+          </div>
+            
+          <button id="button-send" class="btn btn-primary">Send</button>
+        </form>
+
+        <hr>
+        
+
+
+        <div class="input-group mb-3">
+          <input id="text-new-address" type="text" class="form-control" placeholder="Loading the wallet address..." disabled>
+          <div class="input-group-append">
+            <button id="button-new-address" class="btn btn-outline-secondary" type="button">New Address</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- COMMON -->
+      <hr>
+      <div class="alert" id="status-alert">
+          <button type="button" class="close">×</button>
+          <span id="status-text"></span>
+      </div>
+      <label for="textarea-history">Transaction history</label>
+      <textarea class="form-control" id="textarea-history" rows="3" disabled="true"></textarea>
+      
+
+
+      <!-- MODALS -->
+      <!-- CHANGE PUBKEY -->
+      <div class="modal fade" id="modal-change-pubkey" tabindex="-1" role="dialog" aria-labelledby="title-change-pubkey" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="title-change-pubkey">Change Public key</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="form-group">
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">Public key</span>
+                    </div>
+                    <input type="text" class="form-control" id="input-pubkey" placeholder="A new key will be generated...">
+                    <small class="form-text text-muted">
+                        You can also leave this input box <strong>empty</strong> and save to <strong>generate a new key</strong>.
+                    </small>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button id="button-save-pubkey" type="button" class="btn btn-primary">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+
+
+
+      <!-- SHOW KEYS -->
+      <div class="modal fade" id="modal-show-keys" tabindex="-1" role="dialog" aria-labelledby="title-show-keys" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="title-show-keys">Show keys</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              Keep these somewhere safe.
+
+              <hr>
+              
+              <form>
+                  <div class="form-group">
+                      <label><strong>First</strong> generated key pair</label>
+
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">Private</span>
+                        </div>
+                        <input type="text" class="form-control" id="text-first-privkey" disabled>
+                      </div>
+                      
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">Public</span>
+                        </div>
+                        <input type="text" class="form-control" id="text-first-pubkey" disabled>
+                      </div>
+                  </div>
+                  
+                  <hr>
+
+                  <div class="form-group">
+                      <label><strong>Last</strong> generated key pair</label>
+
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">Private</span>
+                        </div>
+                        <input type="text" class="form-control" id="text-last-privkey" disabled>
+                      </div>
+
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">Public</span>
+                        </div>
+                        <input type="text" class="form-control" id="text-last-pubkey" disabled>
+                      </div>
+                  </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+
+
+      <!-- CREATE TOKEN -->
+      <div class="modal fade" id="modal-create-token" tabindex="-1" role="dialog" aria-labelledby="title-create-token" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="title-create-token">Create a new Token</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="form-group">
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">Name</span>
+                    </div>
+                    <input type="text" class="form-control" id="input-create-token-name"  placeholder="A short name for the token, eg. TOK">
+                  </div>
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">Description</span>
+                    </div>
+                    <input type="text" class="form-control" id="input-create-token-description" placeholder="Information about your token">
+                  </div>
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">Supply</span>
+                    </div>
+                    <input id="input-create-token-supply" type="number" min="0" class="form-control" placeholder="The amount you'll supply for this token, eg. 0.01">
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button id="button-create-token-submit" type="button" class="btn btn-primary">Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+      <!-- LOADING -->
+      <div class="modal fade" id="loader" tabindex="-1" role="dialog" aria-labelledby="loader-label">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-body text-center">
+              <div class="loader"></div>
+              <div clas="loader-txt">
+                <p>Preparing the daemon. <br><br><small>Please wait...</small></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+    </main>
+
+    <script>
+      require('./renderer.js')
+    </script>
+  </body>
+</html>
