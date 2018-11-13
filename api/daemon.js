@@ -6,7 +6,7 @@ let keypair = undefined
 let bin_folder = '~/Documents/komodo/src/'
 let chain_name = 'NAE'
 let coin_name = 'NAE'
-let chain_launch_params = '-ac_supply=100000 -addnode=95.216.196.64 -ac_cc=1337'
+let chain_launch_params = '-ac_supply=100000 -addnode=95.216.196.64 -ac_cc=1337 -gen'
 // Variables
 
 let komodod_path = bin_folder + 'komodod -ac_name=' + chain_name + ' ';
@@ -30,6 +30,7 @@ function startUp(pubkey) {
             
             launchDaemon(pubkey).then(() => {
                 importPrivKey(keypair.privkey).then(address => {
+                    keypair.address = address
                     resolve({ generated: true, privkey: keypair.privkey, pubkey, address })
                 })
             })
@@ -43,6 +44,7 @@ function startUp(pubkey) {
             
             launchDaemon(pubkey).then(() => {
                 getAddressFromPubkey(pubkey).then(address => {
+                    keypair.address = address
                     resolve({ generated: false, privkey: keypair.privkey, pubkey, address })
                 })
             })
@@ -289,7 +291,32 @@ function createTokenTradeOrder(action, supply, tokenid, price) {
         const cli = child_process.exec(command);
         
         cli.stdout.on('data', data => {
-            console.log('Broadcasting token... ' + action)
+            console.log('Broadcasting create trade order... ' + action)
+            broadcastTX(JSON.parse(data).hex).then(txid => {
+                resolve(txid)
+            }).catch(e => {
+                reject(e)
+            })
+        });
+
+        cli.stderr.on('data', data => {
+            reject(data)
+        });
+    })
+}
+
+function fillTokenOrder(func, tokenid, txid, count) {
+    return new Promise((resolve, reject) => {
+        console.log('Filling order token order:' + func + ', tokenid: ' + tokenid + ', txid: ' + txid + ' count: ' + count)
+        
+        let command = cli_path + 'tokenfill' + (func === 'buy' ? 'ask' : 'bid')
+            + ' ' + tokenid + ' ' + txid + ' ' + count
+
+        console.log(command)
+        const cli = child_process.exec(command);
+        
+        cli.stdout.on('data', data => {
+            console.log('Broadcasting fill order... ' + func)
             broadcastTX(JSON.parse(data).hex).then(txid => {
                 resolve(txid)
             }).catch(e => {
@@ -325,5 +352,6 @@ module.exports = {
     sendTokenToAddress,
     createToken,
     createTokenTradeOrder,
-    getTokenOrders
+    getTokenOrders,
+    fillTokenOrder
 } 

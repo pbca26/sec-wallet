@@ -40,7 +40,7 @@ init(store.get('pubkey'))
 // TODO: Use events instead of polling
 setInterval(() => updateBalance(), 1000);
 setInterval(() => updateTokenLists(), 5000);
-setInterval(() => updateTokenOrders(), 500000);
+setInterval(() => updateTokenOrders(), 5000);
 
 // Functions
 function init(pubkey) {
@@ -106,7 +106,7 @@ $('#button-send').click(event => {
         updateBalance()
 
         // Add it to transaction history
-        let transaction_text = addToHistory(address, amount, daemon.getCoinName())
+        let transaction_text = addTransactionToHistory(address, amount, daemon.getCoinName())
 
         // Update status text
         statusAlert(true, transaction_text)
@@ -128,7 +128,7 @@ $('#button-token-send').click(event => {
     // Send to address
     daemon.sendTokenToAddress(token_id, address, amount).then(txid => {
         // Add it to transaction history
-        let transaction_text = addToHistory(address, amount, token_name, 
+        let transaction_text = addTransactionToHistory(address, amount, token_name, 
                                             '\nTransaction ID: ' + txid) 
 
         // Update status text
@@ -157,7 +157,7 @@ function statusAlert(success, text) {
     $(".alert").show();
 }
 
-function addToHistory(address, amount, asset_name, extra='') {
+function addTransactionToHistory(address, amount, asset_name, extra='') {
     var time = new Date().toTimeString().substr(0,8)
 
     let transaction_text = time + ' - Sent ' + amount + ' ' + asset_name + ' to ' + address;
@@ -334,19 +334,17 @@ function updateTokenOrders() {
             let sell = order.funcid === 's' || order.funcid === 'S'
 
             // Reverse, because if you wanna buy, you look at sell-list
-            let act = buy ? 'sell' : sell ? 'buy' : 'unknown-func'
+            order.action = buy ? 'sell' : sell ? 'buy' : 'unknown-func'
+
             
-            console.log('Adding ' + '#table-token-' + act)
-
-            order.act = act
-
             order.real_amount = buy ? order.totalrequired : sell ? order.amount : 'unknown'
-            $('#table-token-' + act).append(`
+            $('#table-token-' + order.action).append(`
                 <tr>
                     <td>${order.name}</td>
                     <td>${order.price}</td>
                     <td>${order.real_amount}</td>
                     <td><button data-toggle="modal" data-target="#modal-token-fill-order" 
+                                data-action="${order.action}" 
                                 data-name="${order.name}" 
                                 data-price="${order.price}"
                                 data-amount="${order.real_amount}"
@@ -360,23 +358,57 @@ function updateTokenOrders() {
 }
 
 
-$(document).on('click', '.button-token-fill-order', function(){
+$(document).on('click', '.button-token-fill-order', function() {
     let btn = $(this);
 
-    let name = btn.data("name")
-    let price = btn.data("price")
-    let amount = btn.data("amount")
-    let tokenid = btn.data("tokenid")
-    let txid = btn.data("txid")
-
+    let action = btn.attr("data-action")
+    let name = btn.attr("data-name")
+    let price = btn.attr("data-price")
+    let amount = btn.attr("data-amount")
+    let tokenid = btn.attr("data-tokenid")
+    let txid = btn.attr("data-txid")
+    console.log('On button open modal, ' + action)
     console.log(name, price, amount, tokenid, txid)
     
+    $('#text-token-fill-order-action').html((action === 'buy' ? 'Sell' : 'Buy') + 'ing Token')
     $('#text-token-fill-order-name').val(name)
     $('#input-token-fill-order-price').val(price)
     $('#input-token-fill-order-amount').val(amount)
 
+    $('#button-token-fill-order-submit').attr('data-action', action)
     $('#button-token-fill-order-submit').attr('data-tokenid', tokenid)
     $('#button-token-fill-order-submit').attr('data-txid', txid)
+})
+
+
+
+$('#button-token-fill-order-submit').click(event => {
+    event.preventDefault();
+    // Close the modal
+    $('#modal-token-fill-order').modal('hide')
+
+    
+
+    let btn = $('#button-token-fill-order-submit')
+
+    // TODO: Validate inputs 
+    let action = btn.attr("data-action")
+    let tokenid = btn.attr("data-tokenid")
+    let txid = btn.attr("data-txid")
+    let count = $('#input-token-fill-order-fill-count').val()
+
+    console.log('On button click submit, ' + action)
+
+    // Send to address
+    daemon.fillTokenOrder(action, tokenid, txid, count).then(() => {
+        // Add it to transaction history
+        let transaction_text = 'Filling token order...'//addTransactionToHistory(address, amount, daemon.getCoinName())
+
+        // Update status text
+        statusAlert(true, transaction_text)
+    }).catch(e => {
+        statusAlert(false, e)
+    })
 })
 
 function openPage(page) {
