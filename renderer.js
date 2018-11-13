@@ -346,7 +346,8 @@ function updateTokenOrders() {
                     <td>${order.name}</td>
                     <td>${order.price}</td>
                     <td>${order.real_amount}</td>
-                    <td><button data-name="${order.name}" 
+                    <td><button data-toggle="modal" data-target="#modal-token-fill-order" 
+                                data-name="${order.name}" 
                                 data-price="${order.price}"
                                 data-amount="${order.real_amount}"
                                 data-tokenid="${order.tokenid}"
@@ -358,10 +359,30 @@ function updateTokenOrders() {
     })
 }
 
+
+$(document).on('click', '.button-token-fill-order', function(){
+    let btn = $(this);
+
+    let name = btn.data("name")
+    let price = btn.data("price")
+    let amount = btn.data("amount")
+    let tokenid = btn.data("tokenid")
+    let txid = btn.data("txid")
+
+    console.log(name, price, amount, tokenid, txid)
+    
+    $('#text-token-fill-order-name').val(name)
+    $('#input-token-fill-order-price').val(price)
+    $('#input-token-fill-order-amount').val(amount)
+
+    $('#button-token-fill-order-submit').attr('data-tokenid', tokenid)
+    $('#button-token-fill-order-submit').attr('data-txid', txid)
+})
+
 function openPage(page) {
     // Hide other pages
     for(let p of pages) {
-        if(p != page) {
+        if(p !== page) {
             $('#' + p + '-page-only').hide();
             $('#nav-' + p).toggleClass("active", false);
         }
