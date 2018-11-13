@@ -39,7 +39,7 @@ init(store.get('pubkey'))
 
 // TODO: Use events instead of polling
 setInterval(() => updateBalance(), 1000);
-setInterval(() => updateTokenList(), 5000);
+setInterval(() => updateTokenLists(), 5000);
 setInterval(() => updateTokenOrders(), 10000);
 
 // Functions
@@ -76,7 +76,7 @@ function init(pubkey) {
             updateNewAddress(wallet.address)
             Promise.all([
                 updateBalance(),
-                updateTokenList()
+                updateTokenLists()
             ]).then(() => {
                 // Unlock input
                 inputLock(false)
@@ -274,21 +274,25 @@ function updateNewAddress(address) {
 }
 
 // Update token list
-function updateTokenList() {
+function updateTokenLists() {
     return daemon.getTokenList().then(list => {
-        // Get current selection
-        let curr_selected = $('#select-tokens option:selected').val()
+        const selects = ['#select-tokens', '#select-token-buy-order', '#select-token-sell-order']
 
         // Remove all
-        $('#select-tokens').children().remove()
-        
-        // Add new ones
-        for(var i = 0; i < list.length; ++i) {
-            $('#select-tokens').append('<option value="' + list[i].id + '">' + list[i].name + ' - ' + list[i].balance + '</option>');
-        }
-        
-        // Remember the selection
-        if(curr_selected !== undefined) $("#select-tokens").val(curr_selected);
+        selects.forEach(s => {
+            // Get current selection
+            let curr_selected = $(s + ' option:selected').val()
+
+            $(s).children().remove()
+
+            // Add new ones
+            for(var i = 0; i < list.length; ++i) {
+                $(s).append('<option value="' + list[i].id + '">' + list[i].name + ' - ' + list[i].balance + '</option>');
+            }
+
+            // Remember the selection
+            if(curr_selected !== undefined) $(s).val(curr_selected);
+        });
     })
 }
 
