@@ -279,16 +279,17 @@ function createToken(name, supply, description) {
 }
 
 
-function createTokenBuyOrder(supply, tokenid, price) {
+function createTokenTradeOrder(action, supply, tokenid, price) {
     return new Promise((resolve, reject) => {
         console.log('Creating token buy order supply:' + supply + ', tokenid: ' + tokenid + ', price: ' + price)
         
-        let command = cli_path + 'tokenbid ' + supply + ' ' + tokenid + ' ' + price
+        let command = cli_path + 'token' + (action === 'buy' ? 'bid' : 'ask')
+            + ' ' + supply + ' ' + tokenid + ' ' + price
 
         const cli = child_process.exec(command);
         
         cli.stdout.on('data', data => {
-            console.log('Broadcasting tokenbid...')
+            console.log('Broadcasting token... ' + action)
             broadcastTX(JSON.parse(data).hex).then(txid => {
                 resolve(txid)
             }).catch(e => {
@@ -323,6 +324,6 @@ module.exports = {
     getKeyPair,
     sendTokenToAddress,
     createToken,
-    createTokenBuyOrder,
+    createTokenTradeOrder,
     getTokenOrders
 } 

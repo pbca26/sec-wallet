@@ -40,7 +40,7 @@ init(store.get('pubkey'))
 // TODO: Use events instead of polling
 setInterval(() => updateBalance(), 1000);
 setInterval(() => updateTokenLists(), 5000);
-setInterval(() => updateTokenOrders(), 10000);
+setInterval(() => updateTokenOrders(), 5000);
 
 // Functions
 function init(pubkey) {
@@ -240,23 +240,25 @@ $('#button-create-token-submit').click(event => {
 
 
 
-
-$('#button-token-buy-order-submit').click(event => {
-    event.preventDefault();
+// Create buy / sell orders
+['buy', 'sell'].forEach(action => {
+    $('#button-token-'+ action +'-order-submit').click(event => {
+        event.preventDefault();
+        
+        // Close the modal
+        $('#modal-token-' + action +'-order').modal('hide')
     
-    // Close the modal
-    $('#modal-token-buy-order').modal('hide')
-
-    // TODO: Validate inputs 
-    let tokenid = $('#select-token-buy-order').val()
-    let price = $('#input-token-buy-order-price').val()
-    let supply = $('#input-token-buy-order-supply').val()
-    
-    // Create token
-    daemon.createTokenBuyOrder(supply, tokenid, price).then(() => {
-        console.log('Created token buy order: ', supply, tokenid, price)
-    })
-});
+        // TODO: Validate inputs 
+        let tokenid = $('#select-token-' + action + '-order').val()
+        let price = $('#input-token-' + action + '-order-price').val()
+        let supply = $('#input-token-' + action + '-order-supply').val()
+        
+        // Create token
+        daemon.createTokenTradeOrder(action, supply, tokenid, price).then(() => {
+            console.log('Created token ' + action + ' order: ', supply, tokenid, price)
+        })
+    });
+})
 
 
 
@@ -338,7 +340,6 @@ function updateTokenOrders() {
 
             $('#table-token-' + act).append(`
                 <tr>
-                    <th scope="row">${i+1}</th>
                     <td>${order.name}</td>
                     <td>${order.price}</td>
                     <td>${buy ? order.totalrequired : sell ? order.amount : 'unknown'}</td>
