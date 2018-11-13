@@ -131,19 +131,6 @@
 
       <!-- TRADE -->
       <div id="trade-page-only">
-
-          <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <button id="button-token-buy-order" type="button" class="btn btn-secondary my-2 my-sm-0" data-toggle="modal" data-target="#modal-token-buy-order">Create a buy order</button>  
-            </div>
-
-            <div class="input-group-append">
-                <button id="button-token-sell-order" type="button" class="btn btn-secondary my-2 my-sm-0" data-toggle="modal" data-target="#modal-token-sell-order">Create a sell order</button>  
-            </div>
-          </div>
-          
-          
-          
           
           <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item">
@@ -159,7 +146,7 @@
             <div role="tabpanel" class="tab-pane fade in active show" id="nav-trade-buy">
                 <div class="panel panel-primary" id="result_panel">
                     <div class="panel-body">
-
+                        <button id="button-token-buy-order" type="button" class="btn btn-secondary my-2 my-sm-0" data-toggle="modal" data-target="#modal-token-buy-order">Create a buy order</button>  
                         <table class="table table-sm">
                           <thead>
                             <tr>
@@ -168,13 +155,7 @@
                               <th scope="col">Supply</th>
                             </tr>
                           </thead>
-                          <tbody id="table-token-buy">
-                            <tr>
-                              <td>NAE</td>
-                              <td>2</td>
-                              <td>20</td>
-                            </tr>
-                          </tbody>
+                          <tbody id="table-token-buy"></tbody>
                         </table>
 
                     </div>
@@ -184,8 +165,7 @@
             <div role="tabpanel" class="tab-pane fade" id="nav-trade-sell">
                 <div class="panel panel-primary" id="result_panel">
                     <div class="panel-body">
-
-
+                        <button id="button-token-sell-order" type="button" class="btn btn-secondary my-2 my-sm-0" data-toggle="modal" data-target="#modal-token-sell-order">Create a sell order</button>  
                         <table class="table table-sm">
                           <thead>
                             <tr>
@@ -194,13 +174,7 @@
                               <th scope="col">Supply</th>
                             </tr>
                           </thead>
-                          <tbody id="table-token-sell">
-                            <tr>
-                              <td>SEC</td>
-                              <td>0.001</td>
-                              <td>5</td>
-                            </tr>
-                          </tbody>
+                          <tbody id="table-token-sell"></tbody>
                         </table>
 
                     </div>
