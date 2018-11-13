@@ -149,6 +149,27 @@ function getTokenList() {
     })
 }
 
+function getTokenOrders() {
+    return new Promise((resolve, reject) => {
+        const cli = child_process.exec(cli_path + 'tokenorders');
+
+        cli.stdout.on('data', orders => {
+            orders = JSON.parse(orders)
+
+
+            // Get token information
+            Promise.all(orders.map(t => {
+                return new Promise((resolve, reject) => {
+                    // Get name and balance
+                    Promise.all([
+                        getTokenName(t.txid).then(name => { t.name = name; })                     
+                    ]).then(() => { resolve() })
+                })
+            })).then(() => { resolve(orders) })
+        });
+    })
+}
+
 function importPrivKey(key) {
     console.log('Importing privkey: ' + key)
     return new Promise((resolve, reject) => {
@@ -277,5 +298,6 @@ module.exports = {
     getTokenList,
     getKeyPair,
     sendTokenToAddress,
-    createToken
+    createToken,
+    getTokenOrders
 } 

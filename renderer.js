@@ -20,14 +20,27 @@ let store = new Store({
   }
 });
 
+// Main pages
+let pages = ['wallet', 'tokens', 'trade']
 
-openPage('wallet')
+// Launch with the first page
+openPage(pages[0])
 
+// Navbar Page buttons
+pages.forEach(page => {
+    $('#nav-' + page).on('click', function(e) {
+        openPage(page)
+    });
+});
+
+
+// Initialize with the saved pubkey
 init(store.get('pubkey'))
 
 // TODO: Use events instead of polling
 setInterval(() => updateBalance(), 1000);
 setInterval(() => updateTokenList(), 5000);
+setInterval(() => updateTokenOrders(), 10000);
 
 // Functions
 function init(pubkey) {
@@ -78,14 +91,6 @@ function init(pubkey) {
 $(".alert").hide();
 $('.alert .close').on('click', function(e) {
     $(this).parent().hide();
-});
-
-$('#nav-wallet').on('click', function(e) {
-    openPage('wallet')
-});
-
-$('#nav-tokens').on('click', function(e) {
-    openPage('tokens')
 });
 
 $('#button-send').click(event => {
@@ -287,9 +292,31 @@ function updateTokenList() {
     })
 }
 
+
+
+// Update token list
+function updateTokenOrders() {
+    return daemon.getTokenOrders().then(list => {
+        // Remove all
+        $('#list-token-buy').children().remove()
+        $('#list-token-sell').children().remove()
+        
+        // Add new ones to correct lists
+        for(var i = 0; i < list.length; ++i) {
+            let buy = list.funcid === 'b' || list.funcid === 'B'
+            let sell = list.funcid === 's' || list.funcid === 'S'
+            
+            let act = buy ? 'buy' : sell ? 'sell' : 'unknown-func'
+            
+            $('#list-token-' + act).append('<li class=\"list-group-item\">' + 
+                list[i].name + ' - ' + list[i].price 
+            + '</li>');
+        }
+    })
+}
+
 function openPage(page) {
     // Hide other pages
-    let pages = ['wallet', 'tokens']
     for(let p of pages) {
         if(p != page) {
             $('#' + p + '-page-only').hide();

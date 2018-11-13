@@ -24,6 +24,9 @@
         <li class="nav-item">
           <a id="nav-tokens" class="nav-link" href="#">Tokens</a>
         </li>
+        <li class="nav-item">
+          <a id="nav-trade" class="nav-link" href="#">Trade</a>
+        </li>
       </ul>
 
       <form class="form-inline my-2 my-lg-0">
@@ -119,6 +122,94 @@
         </div>
       </div>
       
+
+
+
+
+
+
+
+      <!-- TRADE -->
+      <div id="trade-page-only">
+          <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" href="#nav-trade-buy" role="tab" data-toggle="tab">Buy</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#nav-trade-sell" role="tab" data-toggle="tab">Sell</a>
+            </li>
+          </ul>
+          
+          <!-- Tab panes -->
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade in active show" id="nav-trade-buy">
+                <div class="panel panel-primary" id="result_panel">
+                    <div class="panel-body">
+
+                        <table class="table table-sm">
+                          <thead>
+                            <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">Name</th>
+                              <th scope="col">Price</th>
+                              <th scope="col">Supply</th>
+                            </tr>
+                          </thead>
+                          <tbody id="table-token-buy">
+                            <tr>
+                              <th scope="row">1</th>
+                              <td>NAE</td>
+                              <td>2</td>
+                              <td>20</td>
+                            </tr>
+                          </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+
+            <div role="tabpanel" class="tab-pane fade" id="nav-trade-sell">
+                <div class="panel panel-primary" id="result_panel">
+                    <div class="panel-body">
+
+
+                        <table class="table table-sm">
+                          <thead>
+                            <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">Name</th>
+                              <th scope="col">Price</th>
+                              <th scope="col">Supply</th>
+                            </tr>
+                          </thead>
+                          <tbody id="table-token-sell">
+                            <tr>
+                              <th scope="row">1</th>
+                              <td>SEC</td>
+                              <td>0.001</td>
+                              <td>5</td>
+                            </tr>
+                          </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+          </div>
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+
       <!-- COMMON -->
       <hr>
       <div class="alert" id="status-alert">
@@ -128,6 +219,10 @@
       <label for="textarea-history">Transaction history</label>
       <textarea class="form-control" id="textarea-history" rows="3" disabled="true"></textarea>
       
+
+
+
+
 
 
       <!-- MODALS -->
@@ -279,6 +374,51 @@
 
 
 
+
+
+
+
+      <!-- CREATE TOKEN -->
+      <div class="modal fade" id="modal-create-token" tabindex="-1" role="dialog" aria-labelledby="title-create-token" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="title-create-token">Create a new Token</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="form-group">
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">Name</span>
+                    </div>
+                    <input type="text" class="form-control" id="input-create-token-name"  placeholder="A short name for the token, eg. TOK">
+                  </div>
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">Description</span>
+                    </div>
+                    <input type="text" class="form-control" id="input-create-token-description" placeholder="Information about your token">
+                  </div>
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">Supply</span>
+                    </div>
+                    <input id="input-create-token-supply" type="number" min="0" class="form-control" placeholder="The amount you'll supply for this token, eg. 0.01">
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button id="button-create-token-submit" type="button" class="btn btn-primary">Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
 
 
