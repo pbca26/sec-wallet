@@ -387,8 +387,6 @@ $('#button-token-fill-order-submit').click(event => {
     // Close the modal
     $('#modal-token-fill-order').modal('hide')
 
-    
-
     let btn = $('#button-token-fill-order-submit')
 
     // TODO: Validate inputs 
