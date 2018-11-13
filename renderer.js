@@ -76,7 +76,8 @@ function init(pubkey) {
             updateNewAddress(wallet.address)
             Promise.all([
                 updateBalance(),
-                updateTokenLists()
+                updateTokenLists(),
+                updateTokenOrders()
             ]).then(() => {
                 // Unlock input
                 inputLock(false)
@@ -240,6 +241,24 @@ $('#button-create-token-submit').click(event => {
 
 
 
+$('#button-token-buy-order-submit').click(event => {
+    event.preventDefault();
+    
+    // Close the modal
+    $('#modal-token-buy-order').modal('hide')
+
+    // TODO: Validate inputs 
+    let tokenid = $('#select-token-buy-order').val()
+    let price = $('#input-token-buy-order-price').val()
+    let supply = $('#input-token-buy-order-supply').val()
+    
+    // Create token
+    daemon.createTokenBuyOrder(supply, tokenid, price).then(() => {
+        console.log('Created token buy order: ', supply, tokenid, price)
+    })
+});
+
+
 
 
 function inputLock(toggle) {
@@ -301,20 +320,30 @@ function updateTokenLists() {
 // Update token list
 function updateTokenOrders() {
     return daemon.getTokenOrders().then(list => {
+        console.log('TOKEN ORDERS: ', list)
         // Remove all
-        $('#list-token-buy').children().remove()
-        $('#list-token-sell').children().remove()
+        $('#table-token-buy').children().remove()
+        $('#table-token-sell').children().remove()
         
-        // Add new ones to correct lists
+        // Add new ones to correct tables
         for(var i = 0; i < list.length; ++i) {
-            let buy = list.funcid === 'b' || list.funcid === 'B'
-            let sell = list.funcid === 's' || list.funcid === 'S'
+            let order = list[i]
+            let buy = order.funcid === 'b' || order.funcid === 'B'
+            let sell = order.funcid === 's' || order.funcid === 'S'
             
-            let act = buy ? 'buy' : sell ? 'sell' : 'unknown-func'
+            // Reverse, because if you wanna buy, you look at sell-list
+            let act = buy ? 'sell' : sell ? 'buy' : 'unknown-func'
             
-            $('#list-token-' + act).append('<li class=\"list-group-item\">' + 
-                list[i].name + ' - ' + list[i].price 
-            + '</li>');
+            console.log('Adding ' + '#table-token-' + act)
+
+            $('#table-token-' + act).append(`
+                <tr>
+                    <th scope="row">${i+1}</th>
+                    <td>${order.name}</td>
+                    <td>${order.price}</td>
+                    <td>${buy ? order.totalrequired : sell ? order.amount : 'unknown'}</td>
+                </tr>
+            `);
         }
     })
 }

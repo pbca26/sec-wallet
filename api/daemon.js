@@ -162,7 +162,7 @@ function getTokenOrders() {
                 return new Promise((resolve, reject) => {
                     // Get name and balance
                     Promise.all([
-                        getTokenName(t.txid).then(name => { t.name = name; })                     
+                        getTokenName(t.tokenid).then(name => { t.name = name; })                     
                     ]).then(() => { resolve() })
                 })
             })).then(() => { resolve(orders) })
@@ -279,6 +279,30 @@ function createToken(name, supply, description) {
 }
 
 
+function createTokenBuyOrder(supply, tokenid, price) {
+    return new Promise((resolve, reject) => {
+        console.log('Creating token buy order supply:' + supply + ', tokenid: ' + tokenid + ', price: ' + price)
+        
+        let command = cli_path + 'tokenbid ' + supply + ' ' + tokenid + ' ' + price
+
+        const cli = child_process.exec(command);
+        
+        cli.stdout.on('data', data => {
+            console.log('Broadcasting tokenbid...')
+            broadcastTX(JSON.parse(data).hex).then(txid => {
+                resolve(txid)
+            }).catch(e => {
+                reject(e)
+            })
+        });
+
+        cli.stderr.on('data', data => {
+            reject(data)
+        });
+    })
+}
+
+
 function getCoinName() {
     return coin_name
 }
@@ -299,5 +323,6 @@ module.exports = {
     getKeyPair,
     sendTokenToAddress,
     createToken,
+    createTokenBuyOrder,
     getTokenOrders
 } 
