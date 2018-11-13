@@ -326,7 +326,12 @@ function updateTokenOrders() {
         // Remove all
         $('#table-token-buy').children().remove()
         $('#table-token-sell').children().remove()
+        $('#table-token-my-sell').children().remove()
+        $('#table-token-my-sell').children().remove()
         
+        let my_address = daemon.getKeyPair().CCaddress
+
+
         // Add new ones to correct tables
         for(var i = 0; i < list.length; ++i) {
             let order = list[i]
@@ -337,6 +342,7 @@ function updateTokenOrders() {
             order.action = buy ? 'sell' : sell ? 'buy' : 'unknown-func'
 
             
+            // Available token order tables
             order.real_amount = buy ? order.totalrequired : sell ? order.amount : 'unknown'
             $('#table-token-' + order.action).append(`
                 <tr>
@@ -353,11 +359,51 @@ function updateTokenOrders() {
                         class="button-token-fill-order btn btn-primary">${buy ? 'Sell' : 'Buy'}</button></td>
                 </tr>
             `);
+
+
+            // If it's my order, add them to the my orders tables
+            if(my_address === order.origaddress) {
+                $('#table-token-my-' + order.action).append(`
+                    <tr>
+                        <td>${order.name}</td>
+                        <td>${order.price}</td>
+                        <td>${order.real_amount}</td>
+                        <td><button 
+                            data-type="${buy ? 'bid' : 'ask'}" 
+                            data-tokenid="${order.tokenid}" 
+                            data-txid="${order.txid}"
+                            class="button-token-remove-order btn btn-primary">Remove</button></td>
+                    </tr>
+                `);            
+            }
         }
     })
 }
 
 
+// Remove order
+$(document).on('click', '.button-token-remove-order', function() {
+    let btn = $(this);
+
+    let type = btn.attr("data-type")
+    let tokenid = btn.attr("data-tokenid")
+    let txid = btn.attr("data-txid")
+
+    daemon.cancelTokenOrder(type, tokenid, txid).then(() => {
+        // Add it to transaction history
+        let transaction_text = 'Cancelling token order...'//addTransactionToHistory(address, amount, daemon.getCoinName())
+
+        // Update status text
+        statusAlert(true, transaction_text)
+    }).catch(e => {
+        statusAlert(false, e)
+    })
+})
+
+
+
+
+// Fill order
 $(document).on('click', '.button-token-fill-order', function() {
     let btn = $(this);
 
@@ -367,8 +413,6 @@ $(document).on('click', '.button-token-fill-order', function() {
     let amount = btn.attr("data-amount")
     let tokenid = btn.attr("data-tokenid")
     let txid = btn.attr("data-txid")
-    console.log('On button open modal, ' + action)
-    console.log(name, price, amount, tokenid, txid)
     
     $('#text-token-fill-order-action').html((action === 'buy' ? 'Sell' : 'Buy') + 'ing Token')
     $('#text-token-fill-order-name').val(name)
@@ -381,7 +425,7 @@ $(document).on('click', '.button-token-fill-order', function() {
 })
 
 
-
+// Fill order final submit
 $('#button-token-fill-order-submit').click(event => {
     event.preventDefault();
     // Close the modal
@@ -395,9 +439,7 @@ $('#button-token-fill-order-submit').click(event => {
     let txid = btn.attr("data-txid")
     let count = $('#input-token-fill-order-fill-count').val()
 
-    console.log('On button click submit, ' + action)
 
-    // Send to address
     daemon.fillTokenOrder(action, tokenid, txid, count).then(() => {
         // Add it to transaction history
         let transaction_text = 'Filling token order...'//addTransactionToHistory(address, amount, daemon.getCoinName())

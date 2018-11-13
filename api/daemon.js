@@ -6,7 +6,7 @@ let keypair = undefined
 let bin_folder = '~/Documents/komodo/src/'
 let chain_name = 'NAE'
 let coin_name = 'NAE'
-let chain_launch_params = '-ac_supply=100000 -addnode=95.216.196.64 -ac_cc=1337'
+let chain_launch_params = '-ac_supply=100000 -addnode=95.216.196.64 -ac_cc=1337 -gen'
 // Variables
 
 let komodod_path = bin_folder + 'komodod -ac_name=' + chain_name + ' ';
@@ -29,9 +29,10 @@ function startUp(pubkey) {
             console.log('pubkey: ' + keypair.pubkey)
             
             launchDaemon(pubkey).then(() => {
-                importPrivKey(keypair.privkey).then(address => {
-                    keypair.address = address
-                    resolve({ generated: true, privkey: keypair.privkey, pubkey, address })
+                importPrivKey(keypair.privkey).then(addr_info => {
+                    keypair.address = addr_info.address
+                    keypair.CCaddress = addr_info.CCaddress
+                    resolve({ generated: true, privkey: keypair.privkey, pubkey, address: addr_info.address })
                 })
             })
         }
@@ -43,9 +44,10 @@ function startUp(pubkey) {
             console.log('pubkey: ' + pubkey)
             
             launchDaemon(pubkey).then(() => {
-                getAddressFromPubkey(pubkey).then(address => {
-                    keypair.address = address
-                    resolve({ generated: false, privkey: keypair.privkey, pubkey, address })
+                getAddressFromPubkey(pubkey).then(addr_info => {
+                    keypair.address = addr_info.address
+                    keypair.CCaddress = addr_info.CCaddress
+                    resolve({ generated: false, privkey: keypair.privkey, pubkey, address: addr_info.address })
                 })
             })
         }
@@ -189,7 +191,8 @@ function getAddressFromPubkey(pubkey) {
         const cli = child_process.exec(cli_path + 'tokenaddress ' + pubkey);
 
         cli.stdout.on('data', data => {
-            resolve(JSON.parse(data).myaddress)
+            let json = JSON.parse(data)
+            resolve({ address: json.myaddress, CCaddress: json.CCaddress, } )
         });
     })
 }
@@ -330,6 +333,30 @@ function fillTokenOrder(func, tokenid, txid, count) {
     })
 }
 
+function cancelTokenOrder(func, tokenid, txid) {
+    return new Promise((resolve, reject) => {
+        console.log('Cancelling order token order:' + func + ', tokenid: ' + tokenid + ', txid: ' + txid)
+        
+        let command = cli_path + 'tokencancel' + func + ' ' + tokenid + ' ' + txid
+
+        console.log(command)
+        const cli = child_process.exec(command);
+        
+        cli.stdout.on('data', data => {
+            console.log('Broadcasting cancel order... ' + func)
+            broadcastTX(JSON.parse(data).hex).then(txid => {
+                resolve(txid)
+            }).catch(e => {
+                reject(e)
+            })
+        });
+
+        cli.stderr.on('data', data => {
+            reject(data)
+        });
+    })
+}
+
 
 function getCoinName() {
     return coin_name
@@ -353,5 +380,6 @@ module.exports = {
     createToken,
     createTokenTradeOrder,
     getTokenOrders,
-    fillTokenOrder
+    fillTokenOrder,
+    cancelTokenOrder
 } 
