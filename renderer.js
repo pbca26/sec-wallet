@@ -40,7 +40,7 @@ init(store.get('pubkey'))
 // TODO: Use events instead of polling
 setInterval(() => updateBalance(), 1000);
 setInterval(() => updateTokenLists(), 5000);
-setInterval(() => updateTokenOrders(), 5000);
+setInterval(() => updateTokenOrders(), 500000);
 
 // Functions
 function init(pubkey) {
@@ -332,17 +332,26 @@ function updateTokenOrders() {
             let order = list[i]
             let buy = order.funcid === 'b' || order.funcid === 'B'
             let sell = order.funcid === 's' || order.funcid === 'S'
-            
+
             // Reverse, because if you wanna buy, you look at sell-list
             let act = buy ? 'sell' : sell ? 'buy' : 'unknown-func'
             
             console.log('Adding ' + '#table-token-' + act)
 
+            order.act = act
+
+            order.real_amount = buy ? order.totalrequired : sell ? order.amount : 'unknown'
             $('#table-token-' + act).append(`
                 <tr>
                     <td>${order.name}</td>
                     <td>${order.price}</td>
-                    <td>${buy ? order.totalrequired : sell ? order.amount : 'unknown'}</td>
+                    <td>${order.real_amount}</td>
+                    <td><button data-name="${order.name}" 
+                                data-price="${order.price}"
+                                data-amount="${order.real_amount}"
+                                data-tokenid="${order.tokenid}"
+                                data-txid="${order.txid}"
+                        class="button-token-fill-order btn btn-primary">${buy ? 'Sell' : 'Buy'}</button></td>
                 </tr>
             `);
         }
