@@ -3,21 +3,6 @@
 window.$ = window.jQuery = require('jquery')
 window.Bootstrap = require('bootstrap')
 
-let daemon = require('./api/daemon.js')
-let Store = require('./api/store.js');
-
-let store = new Store({
-  configName: 'user-data',
-  defaults: {
-    first_privkey: '',
-    first_pubkey: '',
-
-    generated_privkey: '',
-    generated_pubkey: '',
-
-    pubkey: '',
-  }
-});
 
 ////// SET PAGES 
 // Main pages
@@ -35,16 +20,63 @@ pages.forEach(page => {
 ////// SET PAGES
 
 
-// Initialize with the saved pubkey
-init(store.get('pubkey'))
+
+
+
+let daemon = require('./api/daemon.js')
+
+// User data
+let Store = require('./api/store.js');
+let store = new Store({
+  configName: 'user-data',
+  defaults: {
+    first_privkey: '',
+    first_pubkey: '',
+
+    generated_privkey: '',
+    generated_pubkey: '',
+
+    pubkey: '',
+  }
+});
+
+
+
+// wallet.dat encryption/decryption
+const { Safe } = require("./api/safe.js");
+var wallet_dat_path = "safe.dat"
+var safe = new Safe(wallet_dat_path);
+
+// safe.setPassword('papapa')
+// safe.encrypt({kek:'kekkeri'})
+
+// Try to decrypt at very start
+tryDecrypt().then(result => {
+    console.log('Try decrypt: ', result)
+
+    // Password required
+    if(result === 'enter_password') promptPasswordScreen('decrypt')
+    // START
+    else firstLaunch()
+})
 
 
 ////// RUN ONLY ONCE
-// TODO: Use events instead of polling
-setInterval(() => updateBalance(), 1000);
-setInterval(() => updateTokenLists(), 5000);
-setInterval(() => updateTokenOrders(), 5000);
-////// RUN ONLY ONCE
+function firstLaunch() {
+    // Initialize with the saved pubkey
+    init(store.get('pubkey'))
+
+    // TODO: Use events instead of polling
+    setInterval(() => updateBalance(), 1000);
+    setInterval(() => updateTokenLists(), 5000);
+    setInterval(() => updateTokenOrders(), 5000);
+}
+
+
+
+
+
+
 
 
 
@@ -64,6 +96,71 @@ setInterval(() => updateTokenOrders(), 5000);
 
 
 // Functions
+function tryDecrypt(password) {
+    if(password) safe.setPassword(password)
+
+    return safe.decryptAsync().then(d => {
+        return d
+    }).catch(e => {
+        if(e.message !== undefined) {
+            // No issue: File not found, probably the first time launching the komodod and this app
+            if(safe.errFileNotFound(e.message)) {
+                console.log('File not found, probably it\'s the first launch: ' + wallet_dat_path)
+                return 'file_not_found'
+            }
+            // No issue: File not encrypted, probably komodod launched before but, it's the first time launching this app
+            else if(safe.errFileNotEncrypted(e.message)) {
+                console.log('File is not encrypted: ' + wallet_dat_path)
+                return 'file_not_encrypted'
+            }
+            // Issue: Wrong password, should try again
+            else if(safe.errWrongPassword(e.message)) {
+                console.log('Wrong password: ' + wallet_dat_path)
+                return 'enter_password'
+            }
+            return 'Unknown error'
+        }
+    });
+}
+
+
+
+function promptPasswordScreen(type) {
+    if(type === 'encrypt') {
+        $('#text-enter-password-small').html('Encryption is suggested but <strong>optional</strong>, you may leave the password empty.')
+    }
+    else if(type === 'decrypt') {
+        $('#text-enter-password-small').html('Wallet is <strong>encrypted</strong>. You have to enter the correct password to continue.')
+    }
+
+    $('#input-password').attr('placeholder', 'Enter password to ' + type + ' the wallet.')
+    $('#modal-enter-password').modal({ backdrop: 'static', keyboard: false })
+}
+
+$('#button-submit-password').click(event => {
+    event.preventDefault();
+
+    // TODO: Validate inputs 
+    let password = $('#input-password').val()
+
+    // Hide the error
+    $("#status-alert-password").hide();
+    
+    // Try decrypting
+    tryDecrypt(password).then(result => {
+        if(result === 'enter_password') {
+            $("#status-alert-password").show();
+        }
+        // Successfull decryption
+        else {
+            // Close the modal
+            $('#modal-enter-password').modal('hide')
+            firstLaunch()
+        }
+    })
+});
+
+
 function init(pubkey) {
     return new Promise((resolve, reject) => {
         inputLock(true);
@@ -110,7 +207,7 @@ function init(pubkey) {
 }
 
 
-$(".alert").hide();
+$('.alert').hide();
 $('.alert .close').on('click', function(e) {
     $(this).parent().hide();
 });
@@ -164,18 +261,18 @@ function statusAlert(success, text) {
     
     if(success) {
         // Remove danger
-        $(".alert").removeClass("alert-danger")
+        $("#status-alert").removeClass("alert-danger")
         // Add success
-        if(!$(".alert").hasClass("alert-success")) $(".alert").addClass("alert-success")
+        if(!$("#status-alert").hasClass("alert-success")) $("#status-alert").addClass("alert-success")
     }
     else {
         // Remove success
-        $(".alert").removeClass("alert-success")
+        $("#status-alert").removeClass("alert-success")
         // Add danger
-        if(!$(".alert").hasClass("alert-danger")) $(".alert").addClass("alert-danger")
+        if(!$("#status-alert").hasClass("alert-danger")) $("#status-alert").addClass("alert-danger")
     }
 
-    $(".alert").show();
+    $("#status-alert").show();
 }
 
 function addTransactionToHistory(address, amount, asset_name, extra='') {

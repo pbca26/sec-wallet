@@ -4,9 +4,13 @@ const crypto = require("crypto");
 const algorithm = 'aes-256-cbc'
 
 class Safe {
-    constructor(filePath, password) {
+    constructor(filePath, password='') {
         this.filePath = filePath;
         this.password = password;
+    }
+
+    setPassword(password) {
+        this.password = password
     }
 
     errFileNotEncrypted(msg) {

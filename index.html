@@ -242,6 +242,45 @@
 
 
       <!-- MODALS -->
+      <!-- ENTER PASSWORD -->
+      <div class="modal fade" id="modal-enter-password" tabindex="-1" role="dialog" aria-labelledby="title-enter-password" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="title-enter-password">Enter password</h5>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="form-group">
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">Password</span>
+                    </div>
+                    <input type="text" class="form-control" id="input-password" placeholder="">
+                    <small id="text-enter-password-small" class="form-text text-muted"></small>
+                  </div>
+                </div>
+              </form>
+
+              <div class="alert alert-danger" id="status-alert-password">
+                <button type="button" class="close">×</button>
+                <span id="status-text">Incorrect password, please try again.</span>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button id="button-submit-password" type="button" class="btn btn-primary">Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+
+
+
+
+
       <!-- CHANGE PUBKEY -->
       <div class="modal fade" id="modal-change-pubkey" tabindex="-1" role="dialog" aria-labelledby="title-change-pubkey" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
