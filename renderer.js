@@ -3,7 +3,6 @@
 window.$ = window.jQuery = require('jquery')
 window.Bootstrap = require('bootstrap')
 
-
 ////// SET PAGES 
 // Main pages
 let pages = ['wallet', 'tokens', 'trade']
@@ -24,6 +23,56 @@ pages.forEach(page => {
 
 
 let daemon = require('./api/daemon.js')
+
+let loading = false
+let preventWindowClose = false
+
+
+// On close
+let main = require('electron').remote.require('./main.js')
+let mainWindow = require('electron').remote.getCurrentWindow()
+
+function setPreventWindowClose(toggle) {
+    main.setPreventWindowClose(toggle)
+    preventWindowClose = toggle
+}
+
+function setLoading(toggle) {
+    main.setLoading(toggle)
+    loading = status
+}
+
+let exitInitialized = false
+mainWindow.on('close', e => {
+    if(preventWindowClose || loading) {
+        e.preventDefault() // Prevents the window from closing 
+        console.log('Prevented close request! loading: ' + loading)
+
+        // Prevent spam click, don't enter this if it's just loading
+        if(!loading && !exitInitialized) {
+            console.log('Window close request, opening encryption screen')
+
+            exitInitialized = true
+            inputLock(true, 'Stopping the daemon, then you\'ll enter a password to encrypt the wallet...');
+            daemon.stopDaemon().then(() => {
+                inputLock(false)
+                promptPasswordScreen('encrypt')
+            })
+        }
+    }
+    else {
+        // Close the daemon, just in case
+        daemon.stopDaemon()
+    }
+})
+
+
+
+
+
+
+
+
 
 // User data
 let Store = require('./api/store.js');
@@ -64,7 +113,10 @@ tryDecrypt().then(result => {
 ////// RUN ONLY ONCE
 function firstLaunch() {
     // Initialize with the saved pubkey
-    init(store.get('pubkey'))
+    init(store.get('pubkey')).then(() => {
+        // Disable window close, require 
+        setPreventWindowClose(true)
+    })
 
     // TODO: Use events instead of polling
     setInterval(() => updateBalance(), 1000);
@@ -99,8 +151,9 @@ function firstLaunch() {
 function tryDecrypt(password) {
     if(password) safe.setPassword(password)
 
-    return safe.decryptAsync().then(d => {
-        return d
+    return safe.decryptFile().then(d => {
+        console.log('Decrypted successfully: ' + wallet_dat_path)
+        return 'success'
     }).catch(e => {
         if(e.message !== undefined) {
             // No issue: File not found, probably the first time launching the komodod and this app
@@ -118,8 +171,25 @@ function tryDecrypt(password) {
                 console.log('Wrong password: ' + wallet_dat_path)
                 return 'enter_password'
             }
+            console.log('Unknown error: ' + wallet_dat_path)
             return 'Unknown error'
         }
+    });
+}
+
+function tryEncrypt(password) {
+    safe.setPassword(password)
+    if(password === '') {
+        return new Promise((resolve, reject) => {
+            console.log('Skipping encryption')
+            resolve('skip_encryption')
+        })
+    }
+    
+    return safe.encryptFile().then(d => {
+        return d
+    }).catch(e => {
+        return e
     });
 }
 
@@ -127,12 +197,15 @@ function tryDecrypt(password) {
 
 function promptPasswordScreen(type) {
     if(type === 'encrypt') {
-        $('#text-enter-password-small').html('Encryption is suggested but <strong>optional</strong>, you may leave the password empty.')
+        $('#button-submit-password').html('Encrypt and quit')
+        $('#text-enter-password-small').html(`<strong>Be careful! You won't be able to access your wallet if you forget this password.</strong> However, the password is <strong>optional</strong>, you may leave it empty.`)
     }
     else if(type === 'decrypt') {
+        $('#button-submit-password').html('Decrypt')
         $('#text-enter-password-small').html('Wallet is <strong>encrypted</strong>. You have to enter the correct password to continue.')
     }
 
+    $('#button-submit-password').attr('data-action', type)
     $('#input-password').attr('placeholder', 'Enter password to ' + type + ' the wallet.')
     $('#modal-enter-password').modal({ backdrop: 'static', keyboard: false })
 }
@@ -142,28 +215,43 @@ $('#button-submit-password').click(event => {
 
     // TODO: Validate inputs 
     let password = $('#input-password').val()
+    let action = $('#button-submit-password').attr('data-action')
+
+    console.log('action:' + action + '  password: ' + password)
 
     // Hide the error
     $("#status-alert-password").hide();
     
     // Try decrypting
-    tryDecrypt(password).then(result => {
-        if(result === 'enter_password') {
-            $("#status-alert-password").show();
-        }
-        // Successfull decryption
-        else {
-            // Close the modal
-            $('#modal-enter-password').modal('hide')
-            firstLaunch()
-        }
-    })
+    if(action === 'decrypt') {
+        tryDecrypt(password).then(result => {
+            if(result === 'enter_password') {
+                $("#status-alert-password").show();
+            }
+            // Successfull decryption
+            else {
+                // Close the modal
+                $('#modal-enter-password').modal('hide')
+                firstLaunch()
+            }
+        })
+    }
+    else if(action === 'encrypt') {
+        $('#button-submit-password').attr('disabled', true)
+        console.log('Encrypting...')
+        tryEncrypt(password).then(result => {
+            console.log(result)
+            setPreventWindowClose(false)
+            
+            mainWindow.close()
+        })
+    }
 });
 
 
 function init(pubkey) {
     return new Promise((resolve, reject) => {
-        inputLock(true);
+        inputLock(true, 'Preparing the daemon.');
 
         // Launch daemon 
         daemon.startUp(pubkey).then(wallet => {
@@ -318,7 +406,7 @@ $('#button-save-pubkey').click(event => {
     
     if(new_pubkey !== daemon.getKeyPair().pubkey) {
         // Restart the daemon
-        inputLock(true);
+        inputLock(true, 'Restarting the daemon...');
         daemon.stopDaemon().then(() => {
             init(new_pubkey).then(() => {
                 console.log('Restarted the daemon.')
@@ -381,7 +469,9 @@ $('#button-create-token-submit').click(event => {
 
 
 
-function inputLock(toggle) {
+function inputLock(toggle, message='') {
+    setLoading(toggle)
+
     $('#button-send').prop('disabled', toggle);
     $('#button-new-address').prop('disabled', toggle);
     $('#button-change-pubkey').prop('disabled', toggle);
@@ -389,6 +479,8 @@ function inputLock(toggle) {
     $('#button-show-keys').prop('disabled', toggle);
 
     if(toggle) {
+        $("#loader-txt").html(message)
+
         $("#loader").modal({
             backdrop: "static", // Remove ability to close modal with click
             keyboard: false, // Remove option to close with keyboard

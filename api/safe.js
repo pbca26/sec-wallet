@@ -77,6 +77,34 @@ class Safe {
             throw new Error(exception.message);
         }
     }
+
+    decryptFile() {
+        return new Promise((resolve, reject) => {
+            fs.readFile(this.filePath, (error, data) => {
+                if(error) reject(error);
+                
+                try { 
+                    fs.writeFileSync(this.filePath, Buffer.from(this._decrypt(data).data))
+                    resolve( { message: 'success'} ); 
+                } 
+                catch (exception) { reject({ message: exception.message }); }
+            });
+        });
+    }
+
+    encryptFile() {
+        return new Promise((resolve, reject) => {
+            fs.readFile(this.filePath, (error, data) => {
+                if(error) reject(error);
+
+                try { 
+                    fs.writeFileSync(this.filePath, this._encrypt(data));
+                    resolve( { message: 'success'} ); 
+                } 
+                catch (exception) { reject({ message: exception.message }); }
+            });
+        });
+    }
 }
 
 exports.Safe = Safe;
