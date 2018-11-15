@@ -6,7 +6,7 @@ let keypair = undefined
 let bin_folder = '~/Documents/komodo/src/'
 let chain_name = 'NAE'
 let coin_name = 'NAE'
-let chain_launch_params = '-ac_supply=100000 -addnode=95.216.196.64 -ac_cc=1337 -gen'
+let chain_launch_params = '-ac_supply=100000 -addnode=95.216.196.64 -ac_cc=1337'
 // Variables
 
 let komodod_path = bin_folder + 'komodod -ac_name=' + chain_name + ' ';
