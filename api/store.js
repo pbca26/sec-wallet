@@ -2,6 +2,7 @@ const electron = require('electron');
 const path = require('path');
 const fs = require('fs');
 
+
 class Store {
   constructor(opts) {
     // Renderer process has to get `app` module via `remote`, whereas the main process can get it directly

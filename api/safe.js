@@ -1,5 +1,5 @@
-const FileSystem = require("fs");
-const Crypto = require("crypto");
+const fs = require("fs");
+const crypto = require("crypto");
 
 const algorithm = 'aes-256-cbc'
 
@@ -9,13 +9,25 @@ class Safe {
         this.password = password;
     }
 
+    errFileNotEncrypted(msg) {
+        return msg.indexOf('0606506D') !== -1
+    }
+
+    errWrongPassword(msg) {
+        return msg.indexOf('06065064') !== -1
+    }
+
+    errFileNotFound(msg) {
+        return msg.indexOf('no such file or directory') !== -1
+    }
+
     _encrypt(data) {
-        var cipher = Crypto.createCipher(algorithm, this.password);
-        return Buffer.concat([cipher.update(new Buffer(JSON.stringify(data), "utf8")), cipher.final()]);
+        var cipher = crypto.createCipher(algorithm, this.password);
+        return Buffer.concat([cipher.update(new Buffer.from(JSON.stringify(data), "utf8")), cipher.final()]);
     }
 
     _decrypt(data) {
-        var decipher = Crypto.createDecipher(algorithm, this.password);
+        var decipher = crypto.createDecipher(algorithm, this.password);
         var decrypted = Buffer.concat([decipher.update(data), decipher.final()]);
         return JSON.parse(decrypted.toString());
     }
@@ -25,7 +37,7 @@ class Safe {
             try { var encrypted = this._encrypt(data) } 
             catch (exception) { reject({ message: exception.message }); }
             
-            FileSystem.writeFile(this.filePath, encrypted, error => {
+            fs.writeFile(this.filePath, encrypted, error => {
                 if(error) reject(error)
                 
                 resolve({ message: "Encrypted!" });
@@ -35,7 +47,7 @@ class Safe {
 
     encrypt(data) {
         try {
-            FileSystem.writeFileSync(this.filePath, this._encrypt(data));
+            fs.writeFileSync(this.filePath, this._encrypt(data));
             return { message: "Encrypted!" };
         } catch (exception) {
             throw new Error(exception.message);
@@ -44,7 +56,7 @@ class Safe {
 
     decryptAsync() {
         return new Promise((resolve, reject) => {
-            FileSystem.readFile(this.filePath, (error, data) => {
+            fs.readFile(this.filePath, (error, data) => {
                 if(error) reject(error);
 
                 try { resolve(this._decrypt(data)); } 
@@ -55,7 +67,7 @@ class Safe {
 
     decrypt() {
         try {
-            var data = FileSystem.readFileSync(this.filePath);
+            var data = fs.readFileSync(this.filePath);
             return this._decrypt(data);
         } catch (exception) {
             throw new Error(exception.message);

@@ -4,7 +4,6 @@ window.$ = window.jQuery = require('jquery')
 window.Bootstrap = require('bootstrap')
 
 let daemon = require('./api/daemon.js')
-
 let Store = require('./api/store.js');
 
 let store = new Store({
@@ -20,6 +19,7 @@ let store = new Store({
   }
 });
 
+////// SET PAGES 
 // Main pages
 let pages = ['wallet', 'tokens', 'trade']
 
@@ -32,15 +32,36 @@ pages.forEach(page => {
         openPage(page)
     });
 });
+////// SET PAGES
 
 
 // Initialize with the saved pubkey
 init(store.get('pubkey'))
 
+
+////// RUN ONLY ONCE
 // TODO: Use events instead of polling
 setInterval(() => updateBalance(), 1000);
 setInterval(() => updateTokenLists(), 5000);
 setInterval(() => updateTokenOrders(), 5000);
+////// RUN ONLY ONCE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Functions
 function init(pubkey) {
