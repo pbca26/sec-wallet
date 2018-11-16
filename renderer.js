@@ -206,16 +206,29 @@ function tryEncrypt(password) {
 
 
 
+$('#button-enter-password-edit').click(event => {
+    event.preventDefault();
+    
+    $('#input-password').attr('disabled', !$('#input-password').attr('disabled'))
+})
+
+
 function promptPasswordScreen(type) {
-    if(type === 'encrypt') {
-        $('#button-submit-password').html('Encrypt and quit')
-        $('#text-enter-password-small').html(`<strong>Be careful! You won't be able to access your wallet if you forget this password.</strong> However, you can skip encryption by leaving the password <strong>empty</strong>.`)
-    }
-    else if(type === 'decrypt') {
+    if(type === 'decrypt') {
+        $('#input-password').attr('disabled', false)
         $('#button-submit-password').html('Decrypt')
         $('#text-enter-password-small').html('Wallet is <strong>encrypted</strong>. You have to enter the correct password to continue.')
-    }
 
+        $('#div-enter-password-edit').hide()
+    }
+    else if(type === 'encrypt') {
+        $('#input-password').attr('disabled', true)
+        $('#button-submit-password').html('Encrypt and quit')
+        $('#text-enter-password-small').html(`<strong>Be careful! You won't be able to access your wallet if you forget this password.</strong> However, you can skip encryption by leaving the password <strong>empty</strong>.`)
+
+        $('#div-enter-password-edit').show()
+    }
+    
     $('#button-submit-password').attr('data-action', type)
     $('#input-password').attr('placeholder', 'Enter password to ' + type + ' the wallet.')
     $('#modal-enter-password').modal({ backdrop: 'static', keyboard: false })
