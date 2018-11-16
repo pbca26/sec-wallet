@@ -91,9 +91,13 @@ let store = new Store({
 
 
 
+
+
 // wallet.dat encryption/decryption
+const wallet_dat_path = daemon.getKomodoFolder() + 'safe.dat'
+
 const { Safe } = require("./api/safe.js");
-var wallet_dat_path = "safe.dat"
+
 var safe = new Safe(wallet_dat_path);
 
 // safe.setPassword('papapa')

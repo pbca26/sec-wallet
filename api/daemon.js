@@ -1,6 +1,9 @@
 const child_process = require('child_process');
 const keygen = require('./keygen.js');
 
+const os = require('os')
+const platform = os.platform()
+
 // Variables
 let keypair = undefined 
 let bin_folder = '~/Documents/komodo/src/'
@@ -362,16 +365,35 @@ function getCoinName() {
     return coin_name
 }
 
+function getChainName() {
+    return chain_name
+}
+
 
 function getKeyPair() {
     return keypair
+}
+
+function getKomodoFolder() {
+    // macOS
+    if(platform === 'darwin') 
+        return os.homedir() + '/Library/Application Support/Komodo/' + chain_name + '/'  
+
+    // Windows
+    if(platform === 'win32') 
+        return process.env.APPDATA + '\\Komodo\\' + chain_name + '\\' 
+
+    // Probably Linux
+    return os.homedir() + '/.komodo/' + chain_name + '/'  
 }
 
 module.exports = {
     startUp,
     stopDaemon,
     getBalance,
+    getChainName,
     getCoinName,
+    getKomodoFolder,
     sendToAddress,
     getNewAddress,
     getTokenList,
