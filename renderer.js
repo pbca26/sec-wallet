@@ -222,6 +222,7 @@ $('#button-enter-password-show').on('click', function() {
     else hidePassword()
 });
 
+// Toggle password edit
 $('#button-enter-password-edit').click(event => {
     event.preventDefault();
     
