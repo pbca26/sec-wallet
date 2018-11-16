@@ -52,6 +52,11 @@ class Safe {
             try { 
                 fs.writeFileSync(this.filePath, Buffer.from(this._decrypt(data).data))
                 console.log('Decrypted and saved: ', this.filePath)
+
+                console.log('Removing : ', this.filePath + enc)
+                fs.unlinkSync(this.filePath + enc)
+                console.log('Removed : ', this.filePath + enc)
+
                 resolve({ message: 'success' }); 
             } 
             catch(exception) { 
@@ -63,33 +68,31 @@ class Safe {
 
     encryptFile() {
         return new Promise((resolve, reject) => {
-            // If encrypted file does not exist
-            //if(!fs.existsSync(this.filePath + enc)) {
-                // Read non-encrypted file
-                let data
-                try {  
-                    data = fs.readFileSync(this.filePath) 
-                } 
-                catch(exception) { 
-                    console.log('Could not read to encrypt', this.filePath)
-                    reject({ message: exception.message })
-                }
+            // Read non-encrypted file
+            let data
+            try {  
+                data = fs.readFileSync(this.filePath) 
+            } 
+            catch(exception) { 
+                console.log('Could not read to encrypt', this.filePath)
+                reject({ message: exception.message })
+            }
 
-                // Encrypt and write
-                try {  
-                    fs.writeFileSync(this.filePath + enc, this._encrypt(data));
-                    console.log('Encrypted and saved: ', this.filePath + enc)
-                    resolve({ message: 'success'}); 
-                } 
-                catch(exception) { 
-                    console.log('Could not encrypt the file!', this.filePath)
-                    reject({ message: exception.message })
-                }
-            // }
-            // else {
-            //     console.log('File is already encrypted!')
-            //     resolve( { message: 'success'} ); 
-            // }
+            // Encrypt and write
+            try {  
+                fs.writeFileSync(this.filePath + enc, this._encrypt(data));
+                console.log('Encrypted and saved: ', this.filePath + enc)
+                
+                console.log('Removing : ', this.filePath)
+                fs.unlinkSync(this.filePath)
+                console.log('Removed : ', this.filePath)
+
+                resolve({ message: 'success'}); 
+            } 
+            catch(exception) { 
+                console.log('Could not encrypt the file!', this.filePath)
+                reject({ message: exception.message })
+            }
         });
     }
 }
