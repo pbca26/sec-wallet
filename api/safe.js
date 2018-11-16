@@ -2,7 +2,7 @@ const fs = require("fs");
 const crypto = require("crypto");
 
 const algorithm = 'aes-256-cbc'
-
+const enc = '.enc'
 class Safe {
     constructor(filePath, password='') {
         this.filePath = filePath;
@@ -38,47 +38,58 @@ class Safe {
 
     decryptFile() {
         return new Promise((resolve, reject) => {
-            fs.readFile(this.filePath, (error, data) => {
-                if(error) reject(error);
-                
-                try { 
-                    fs.writeFileSync(this.filePath, Buffer.from(this._decrypt(data).data))
-                    resolve( { message: 'success'} ); 
-                } 
-                catch (exception) { reject({ message: exception.message }); }
-            });
+            // Read encrypted file
+            let data
+            try {  
+                data = fs.readFileSync(this.filePath + enc) 
+            } 
+            catch(exception) { 
+                console.log('Could not read encrypted file, probably first launch', this.filePath)
+                reject({ message: exception.message })
+            }
+
+            // Decrypted and write
+            try { 
+                fs.writeFileSync(this.filePath, Buffer.from(this._decrypt(data).data))
+                console.log('Decrypted and saved: ', this.filePath)
+                resolve({ message: 'success' }); 
+            } 
+            catch(exception) { 
+                console.log('Could not decrypt and save: ', this.filePath)
+                reject({ message: exception.message }); 
+            }
         });
     }
 
     encryptFile() {
         return new Promise((resolve, reject) => {
-            fs.readFile(this.filePath, (error, data) => {
-                if(error) reject(error);
-                
-                // Check if it's encrypted
-                try { 
-                    this._decrypt(data) 
-
-                    // If it decrypts normally, it's already encrypted, don't do anything
-                    console.log('File is already encrypted!')
-                    resolve( { message: 'success'} ); 
+            // If encrypted file does not exist
+            //if(!fs.existsSync(this.filePath + enc)) {
+                // Read non-encrypted file
+                let data
+                try {  
+                    data = fs.readFileSync(this.filePath) 
                 } 
-                catch (exception) { 
-                    // If not encrypted, good, that's what we want
-                    if(this.errFileNotEncrypted(exception.message)) {
-                        try { 
-                            fs.writeFileSync(this.filePath, this._encrypt(data));
-                            resolve( { message: 'success'} ); 
-                        } 
-                        // If couldn't encrypt:
-                        catch (exception) { reject({ message: exception.message }); }
-                    }
-                    else {
-                        console.log('File is already encrypted!')
-                        reject({ message: 'success' })
-                    }
+                catch(exception) { 
+                    console.log('Could not read to encrypt', this.filePath)
+                    reject({ message: exception.message })
                 }
-            });
+
+                // Encrypt and write
+                try {  
+                    fs.writeFileSync(this.filePath + enc, this._encrypt(data));
+                    console.log('Encrypted and saved: ', this.filePath + enc)
+                    resolve({ message: 'success'}); 
+                } 
+                catch(exception) { 
+                    console.log('Could not encrypt the file!', this.filePath)
+                    reject({ message: exception.message })
+                }
+            // }
+            // else {
+            //     console.log('File is already encrypted!')
+            //     resolve( { message: 'success'} ); 
+            // }
         });
     }
 }
