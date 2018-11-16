@@ -204,7 +204,23 @@ function tryEncrypt(password) {
     });
 }
 
+function hidePassword() {    
+    $('#input-password').attr("type", "password");
+    $('#button-enter-password-show').html('Show')
+}
 
+// Toggle password visibility
+$('#button-enter-password-show').on('click', function() {
+    let pass = $('#input-password')
+    
+    let type = pass.attr("type"); 
+
+    if(type === 'password'){
+        pass.attr("type", "text");
+        $('#button-enter-password-show').html('Hide')
+    }
+    else hidePassword()
+});
 
 $('#button-enter-password-edit').click(event => {
     event.preventDefault();
@@ -214,6 +230,8 @@ $('#button-enter-password-edit').click(event => {
 
 
 function promptPasswordScreen(type) {
+    hidePassword()
+
     if(type === 'decrypt') {
         $('#input-password').attr('disabled', false)
         $('#button-submit-password').html('Decrypt')
