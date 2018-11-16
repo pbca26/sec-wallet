@@ -36,48 +36,6 @@ class Safe {
         return JSON.parse(decrypted.toString());
     }
 
-    encryptAsync(data) {
-        return new Promise((resolve, reject) => {
-            try { var encrypted = this._encrypt(data) } 
-            catch (exception) { reject({ message: exception.message }); }
-            
-            fs.writeFile(this.filePath, encrypted, error => {
-                if(error) reject(error)
-                
-                resolve({ message: "Encrypted!" });
-            });
-        });
-    }
-
-    encrypt(data) {
-        try {
-            fs.writeFileSync(this.filePath, this._encrypt(data));
-            return { message: "Encrypted!" };
-        } catch (exception) {
-            throw new Error(exception.message);
-        }
-    }
-
-    decryptAsync() {
-        return new Promise((resolve, reject) => {
-            fs.readFile(this.filePath, (error, data) => {
-                if(error) reject(error);
-
-                try { resolve(this._decrypt(data)); } 
-                catch (exception) { reject({ message: exception.message }); }
-            });
-        });
-    }
-
-    decrypt() {
-        try {
-            var data = fs.readFileSync(this.filePath);
-            return this._decrypt(data);
-        } catch (exception) {
-            throw new Error(exception.message);
-        }
-    }
-
     decryptFile() {
         return new Promise((resolve, reject) => {
             fs.readFile(this.filePath, (error, data) => {
