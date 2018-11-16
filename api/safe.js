@@ -96,12 +96,30 @@ class Safe {
         return new Promise((resolve, reject) => {
             fs.readFile(this.filePath, (error, data) => {
                 if(error) reject(error);
-
+                
+                // Check if it's encrypted
                 try { 
-                    fs.writeFileSync(this.filePath, this._encrypt(data));
+                    this._decrypt(data) 
+
+                    // If it decrypts normally, it's already encrypted, don't do anything
+                    console.log('File is already encrypted!')
                     resolve( { message: 'success'} ); 
                 } 
-                catch (exception) { reject({ message: exception.message }); }
+                catch (exception) { 
+                    // If not encrypted, good, that's what we want
+                    if(this.errFileNotEncrypted(exception.message)) {
+                        try { 
+                            fs.writeFileSync(this.filePath, this._encrypt(data));
+                            resolve( { message: 'success'} ); 
+                        } 
+                        // If couldn't encrypt:
+                        catch (exception) { reject({ message: exception.message }); }
+                    }
+                    else {
+                        console.log('File is already encrypted!')
+                        reject({ message: 'success' })
+                    }
+                }
             });
         });
     }

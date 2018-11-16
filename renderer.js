@@ -198,7 +198,7 @@ function tryEncrypt(password) {
 function promptPasswordScreen(type) {
     if(type === 'encrypt') {
         $('#button-submit-password').html('Encrypt and quit')
-        $('#text-enter-password-small').html(`<strong>Be careful! You won't be able to access your wallet if you forget this password.</strong> However, the password is <strong>optional</strong>, you may leave it empty.`)
+        $('#text-enter-password-small').html(`<strong>Be careful! You won't be able to access your wallet if you forget this password.</strong> However, you can skip encryption by leaving the password <strong>empty</strong>.`)
     }
     else if(type === 'decrypt') {
         $('#button-submit-password').html('Decrypt')
