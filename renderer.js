@@ -94,7 +94,7 @@ let store = new Store({
 
 
 // wallet.dat encryption/decryption
-const wallet_dat_path = daemon.getKomodoFolder() + 'safe.dat'
+const wallet_dat_path = daemon.getKomodoFolder() + 'wallet.dat'
 
 const { Safe } = require("./api/safe.js");
 
