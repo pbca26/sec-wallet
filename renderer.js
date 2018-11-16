@@ -54,16 +54,16 @@ mainWindow.on('close', e => {
 
             exitInitialized = true
             inputLock(true, 'Stopping the daemon, then you\'ll enter a password to encrypt the wallet...');
+
+            stopUpdateIntervals()
             daemon.stopDaemon().then(() => {
                 inputLock(false)
                 promptPasswordScreen('encrypt')
             })
         }
     }
-    else {
-        // Close the daemon, just in case
-        daemon.stopDaemon()
-    }
+    // Shouldn't reach here but just in case, stop the daemon
+    else daemon.stopDaemon()
 })
 
 
@@ -110,7 +110,21 @@ tryDecrypt().then(result => {
 })
 
 
-////// RUN ONLY ONCE
+
+let updateIntervals = []
+
+function startUpdateIntervals() {
+    // TODO: Use events instead of polling
+    updateIntervals.push(setInterval(() => updateBalance(), 1000))
+    updateIntervals.push(setInterval(() => updateTokenLists(), 5000))
+    updateIntervals.push(setInterval(() => updateTokenOrders(), 5000))
+}
+
+function stopUpdateIntervals() {
+    updateIntervals.forEach(id => { clearInterval(id) })
+}
+
+
 function firstLaunch() {
     // Initialize with the saved pubkey
     init(store.get('pubkey')).then(() => {
@@ -118,10 +132,7 @@ function firstLaunch() {
         setPreventWindowClose(true)
     })
 
-    // TODO: Use events instead of polling
-    setInterval(() => updateBalance(), 1000);
-    setInterval(() => updateTokenLists(), 5000);
-    setInterval(() => updateTokenOrders(), 5000);
+    startUpdateIntervals()
 }
 
 
