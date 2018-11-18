@@ -719,3 +719,8 @@ function openPage(page) {
     $('#nav-' + page).toggleClass("active", true);
     $('#' + page + '-page-only').show();
 }
+
+$("#menu-toggle").click(function(e) {
+    e.preventDefault();
+    $("#wrapper").toggleClass("toggled");
+});
