@@ -310,8 +310,6 @@ function init(pubkey) {
                 store.set('generated_privkey', wallet.privkey)
                 store.set('generated_pubkey', wallet.pubkey)
 
-                console.log('Firstprivkey empty: ', store.get('first_privkey') == '')
-                console.log('Firstprivkey empty 2 : ', store.get('first_privkey') === '')
                 console.log('Firstprivkey : ', store.get('first_privkey'))
                 if(store.get('first_privkey') === '') {
                     store.set('first_privkey', wallet.privkey)
