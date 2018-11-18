@@ -3,17 +3,20 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap.css">
     <link rel="stylesheet" href="style.css">
     <title>SEC Wallet</title>
   </head>
   <body>
     <!-- NAV-BAR -->
     <div id='wrapper' class='toggled'>
-      <div id="sidebar-wrapper">
+      <div id="sidebar-wrapper" class="bg-dark">
         <ul class="sidebar-nav">
             <li class="sidebar-brand">
-                <a href="#"> SEC Wallet </a>
+                <a href="#">
+                  <img src="img/sec_logo.png" height="35" class="d-inline-block" alt="">
+                  SEC Wallet 
+                </a>
             </li>
             <li>
               <a id="nav-wallet" href="#">Wallet</a>
@@ -26,27 +29,12 @@
             </li>
             
             <hr>
-            <hr>
-            <hr>
-            <hr>
-            <hr>
-            <hr>
-            <hr>
-            <hr>
-            <hr>
-            <hr>
-            <hr>
-            <hr>
-            <hr>
-            <hr>
-            <hr>
-            <hr>
 
             <li>
                 <button id="button-show-keys" type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#modal-show-keys">Show keys</button>  
             </li>
             <li>
-                <button id="button-change-pubkey" type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-change-pubkey">Change Public key</button>
+                <button id="button-change-pubkey" type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#modal-change-pubkey">Change Public key</button>
             </li>
         </ul>
       </div>
@@ -91,7 +79,7 @@
                   <input id="input-token-amount" type="number" min="0" class="form-control" placeholder="Enter the amount you'll send">
                 </div>
                   
-                <button id="button-token-send" class="btn btn-primary">Send</button>
+                <button id="button-token-send" class="btn btn-info">Send</button>
               </form>
           </div>
 
@@ -124,7 +112,7 @@
                 <input id="input-amount" type="number" min="0" class="form-control" placeholder="Enter the amount you'll send">
               </div>
                 
-              <button id="button-send" class="btn btn-primary">Send</button>
+              <button id="button-send" class="btn btn-info">Send</button>
             </form>
 
             <hr>
@@ -161,7 +149,7 @@
               <!-- Tab panes -->
               <div class="tab-content">
                 <div role="tabpanel" class="tab-pane fade in active show" id="nav-trade-buy">
-                    <div class="panel panel-primary" id="result_panel">
+                    <div class="panel panel-info" id="result_panel">
                         <div class="panel-body">
                             <button id="button-token-buy-order" type="button" class="btn btn-secondary my-2 my-sm-0" data-toggle="modal" data-target="#modal-token-buy-order">Create a buy order</button>  
                             
@@ -196,7 +184,7 @@
                 </div>
 
                 <div role="tabpanel" class="tab-pane fade" id="nav-trade-sell">
-                    <div class="panel panel-primary" id="result_panel">
+                    <div class="panel panel-info" id="result_panel">
                         <div class="panel-body">
                             <button id="button-token-sell-order" type="button" class="btn btn-secondary my-2 my-sm-0" data-toggle="modal" data-target="#modal-token-sell-order">Create a sell order</button>  
                             
@@ -290,7 +278,7 @@
                   </div>
                 </div>
                 <div class="modal-footer">
-                  <button id="button-submit-password" type="button" class="btn btn-primary">Submit</button>
+                  <button id="button-submit-password" type="button" class="btn btn-info">Submit</button>
                 </div>
               </div>
             </div>
@@ -330,7 +318,7 @@
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                  <button id="button-save-pubkey" type="button" class="btn btn-primary">Save</button>
+                  <button id="button-save-pubkey" type="button" class="btn btn-info">Save</button>
                 </div>
               </div>
             </div>
@@ -443,7 +431,7 @@
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                  <button id="button-create-token-submit" type="button" class="btn btn-primary">Submit</button>
+                  <button id="button-create-token-submit" type="button" class="btn btn-info">Submit</button>
                 </div>
               </div>
             </div>
@@ -491,7 +479,7 @@
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button id="button-token-buy-order-submit" type="button" class="btn btn-primary">Submit</button>
+                    <button id="button-token-buy-order-submit" type="button" class="btn btn-info">Submit</button>
                   </div>
                 </div>
               </div>
@@ -535,7 +523,7 @@
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button id="button-token-sell-order-submit" type="button" class="btn btn-primary">Submit</button>
+                    <button id="button-token-sell-order-submit" type="button" class="btn btn-info">Submit</button>
                   </div>
                 </div>
               </div>
@@ -590,7 +578,7 @@
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                      <button id="button-token-fill-order-submit" type="button" class="btn btn-primary">Submit</button>
+                      <button id="button-token-fill-order-submit" type="button" class="btn btn-info">Submit</button>
                     </div>
                   </div>
                 </div>
