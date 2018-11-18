@@ -186,7 +186,7 @@ function tryDecrypt(password) {
                 console.log('Wrong password: ' + wallet_dat_path)
                 return 'enter_password'
             }
-            console.log('Unknown error: ' + wallet_dat_path)
+            console.log('Unknown error: ' + e.message + ' for => '+  wallet_dat_path)
             return 'Unknown error'
         }
     });
