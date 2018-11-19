@@ -215,6 +215,8 @@ function hidePassword() {
 
 // Toggle password visibility
 $('#button-enter-password-show').on('click', function() {
+    event.preventDefault();
+
     let pass = $('#input-password')
     
     let type = pass.attr("type"); 
