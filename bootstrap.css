@@ -2025,7 +2025,7 @@ pre code {
 }
 
 .form-control:disabled, .form-control[readonly] {
-  background-color: #657B83;
+  background-color: rgb(22, 62, 77);
   opacity: 1;
 }
 
