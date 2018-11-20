@@ -98,22 +98,23 @@
             <hr>
             
 
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <span class="input-group-text">Address</span>
+            <form id='form-send'>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Address</span>
+                </div>
+                <input id="input-address" class="form-control" placeholder="Enter the address of recipient" required>
               </div>
-              <input id="input-address" class="form-control" placeholder="Enter the address of recipient" required>
-            </div>
 
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <span class="input-group-text">Amount</span>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Amount</span>
+                </div>
+                <input id="input-amount" type="number" min="0" class="form-control" placeholder="Enter the amount you'll send" required>
               </div>
-              <input id="input-amount" type="number" min="0" class="form-control" placeholder="Enter the amount you'll send" required>
-            </div>
-              
-            <button id="button-send" class="btn btn-info">Send</button>
-
+                
+              <button id="button-send" class="btn btn-info" type="submit">Send</button>
+            </form>
 
             <hr>
             
@@ -125,6 +126,7 @@
                 <button id="button-new-address" class="btn btn-outline-secondary" type="button">New Address</button>
               </div>
             </div>
+            </form>
           </div>
           
 

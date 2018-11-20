@@ -344,9 +344,7 @@ $('.alert .close').on('click', function(e) {
     $(this).parent().hide();
 });
 
-$('#button-send').click(event => {
-    event.preventDefault();
-    
+$('#form-send').submit(event => {    
     let address = $('#input-address').val()
     let amount = $('#input-amount').val()
     // TODO: Validate inputs 
@@ -363,6 +361,8 @@ $('#button-send').click(event => {
     }).catch(e => {
         statusAlert(false, e)
     })
+
+    return false
 })
 
 
