@@ -366,9 +366,7 @@ $('#form-send').submit(event => {
 })
 
 
-$('#button-token-send').click(event => {
-    event.preventDefault();
-
+$('#form-token-send').submit(event => {
     let token_name = $('#select-tokens option:selected').text()
     let token_id = $('#select-tokens').val()
     let address = $('#input-token-address').val()
@@ -386,6 +384,8 @@ $('#button-token-send').click(event => {
     }).catch(e => {
         statusAlert(false, e)
     })
+
+    return false
 })
 
 function statusAlert(success, text) {

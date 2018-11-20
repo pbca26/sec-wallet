@@ -64,23 +64,23 @@
 
             <hr>
 
-
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <span class="input-group-text">Address</span>
+            <form id="form-token-send">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Address</span>
+                </div>
+                <input id="input-token-address" class="form-control" placeholder="Enter the address of recipient" required>
               </div>
-              <input id="input-token-address" class="form-control" placeholder="Enter the address of recipient" required>
-            </div>
-  
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <span class="input-group-text">Amount</span>
+    
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Amount</span>
+                </div>
+                <input id="input-token-amount" type="number" min="0" class="form-control" placeholder="Enter the amount you'll send" required>
               </div>
-              <input id="input-token-amount" type="number" min="0" class="form-control" placeholder="Enter the amount you'll send" required>
-            </div>
-              
-            <button id="button-token-send" class="btn btn-info">Send</button>
-
+                
+              <button id="button-token-send" type="submit" class="btn btn-info">Send</button>
+            </form>
           </div>
 
 
