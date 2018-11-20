@@ -404,6 +404,8 @@ function statusAlert(success, text) {
         if(!$("#status-alert").hasClass("alert-danger")) $("#status-alert").addClass("alert-danger")
     }
 
+    console.log(text)
+
     $("#status-alert").show();
 }
 
@@ -421,8 +423,6 @@ function addToHistory(text) {
     let thistory = $('#textarea-history')
     let curr_text = thistory.val()
     thistory.val(curr_text + (curr_text === '' ? '' : '\n') + text)
-
-    console.log(text)
 
     return text
 }
