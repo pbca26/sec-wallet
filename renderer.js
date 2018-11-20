@@ -178,11 +178,6 @@ function tryDecrypt(password) {
                 console.log('File not found, probably it\'s the first launch: ' + wallet_dat_path)
                 return 'file_not_found'
             }
-            // No issue: File not encrypted, probably komodod launched before but, it's the first time launching this app
-            else if(safe.errFileNotEncrypted(e.message)) {
-                console.log('File is not encrypted: ' + wallet_dat_path)
-                return 'file_not_encrypted'
-            }
             // Issue: Wrong password, should try again
             else if(safe.errWrongPassword(e.message)) {
                 console.log('Wrong password: ' + wallet_dat_path)
@@ -417,12 +412,21 @@ function addTransactionToHistory(address, amount, asset_name, extra='') {
 
     let transaction_text = time + ' - Sent ' + amount + ' ' + asset_name + ' to ' + address;
 
-    let thistory = $('#textarea-history')
-    let curr_text = thistory.val()
-    thistory.val(curr_text + (curr_text === '' ? '' : '\n') + transaction_text)
-
+    addToHistory(transaction_text)
+    
     return transaction_text
 }
+
+function addToHistory(text) {
+    let thistory = $('#textarea-history')
+    let curr_text = thistory.val()
+    thistory.val(curr_text + (curr_text === '' ? '' : '\n') + text)
+
+    console.log(text)
+
+    return text
+}
+
 
 $('#button-show-keys').click(event => {
     event.preventDefault();
@@ -469,7 +473,13 @@ $('#button-new-address').click(event => {
     event.preventDefault();
     
     // Get a new address
-    daemon.getNewAddress().then(address => updateNewAddress(address))
+    daemon.getNewAddress().then(address => {
+        updateNewAddress(address)
+        
+        statusAlert(true, addToHistory('Generated a new address: ' + address))
+    }).catch(e => {
+        statusAlert(false, addToHistory('Could not generate new address: ' + address))
+    })
 });
 
 

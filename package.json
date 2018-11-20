@@ -17,6 +17,7 @@
   ],
   "author": "naezith",
   "devDependencies": {
+    "asymmetric-crypto": "^1.0.2",
     "bitcoinjs-lib": "^4.0.2",
     "bootstrap": "^4.1.3",
     "electron": "^3.0.4",

@@ -137,6 +137,10 @@ function getNewAddress() {
         cli.stdout.on('data', data => {
             resolve(data)
         });
+
+        cli.stderr.on('data', data => {
+            reject(data)
+        });
     })
 }
 
