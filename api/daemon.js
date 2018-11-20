@@ -1,21 +1,52 @@
+const fs = require("fs");
 const child_process = require('child_process');
 const keygen = require('./keygen.js');
 
 const os = require('os')
 const platform = os.platform()
 
-// Variables
+// Data
+let config = {}
+let komodod_path = ''
+let cli_path = ''
 let keypair = undefined 
-let bin_folder = '~/Documents/komodo/src/'
-let chain_name = 'NAE'
-let coin_name = 'NAE'
-let chain_launch_params = '-ac_supply=100000 -addnode=95.216.196.64 -ac_cc=1337'
-// Variables
 
-let komodod_path = bin_folder + 'komodod -ac_name=' + chain_name + ' ';
-let cli_path = bin_folder + 'komodo-cli -ac_name=' + chain_name + ' ';
+function readConfig() {
+    // Set default
+    config = {
+        bin_folder: '~/Documents/komodo/src/',
+        chain_name: 'NAE',
+        coin_name: 'NAE',
+        chain_launch_params: '-ac_supply=100000 -addnode=95.216.196.64 -ac_cc=1337'
+    }
 
+    const config_path = getKomodoFolder() + 'gui_config.json'
+    try {
+        let data = JSON.parse(fs.readFileSync(config_path))
 
+        // Set the value from the file if it exists
+        if(data) {
+            if(data.bin_folder) config.bin_folder = data.bin_folder
+            if(data.chain_name) config.chain_name = data.chain_name
+            if(data.coin_name) config.coin_name = data.coin_name
+            if(data.chain_launch_params) config.chain_launch_params = data.chain_launch_params
+        }
+
+        console.log('Successfully loaded config file: ' + config_path)
+    }
+    catch(exception) {
+        console.log('Config file does not exist or has invalid JSON, generating the default one' + config_path)
+    }
+
+    // Write config
+    fs.writeFileSync(config_path, JSON.stringify(config))
+
+    console.log('Config: ', config)
+
+    // Refresh other variables
+    komodod_path = config.bin_folder + 'komodod -ac_name=' + config.chain_name + ' '
+    cli_path = config.bin_folder + 'komodo-cli -ac_name=' + config.chain_name + ' '
+}
 
 
 
@@ -60,7 +91,7 @@ function startUp(pubkey) {
 
 function launchDaemon(pubkey) {
     return new Promise((resolve, reject) => {
-        let command = komodod_path + chain_launch_params + ' -pubkey=' + pubkey
+        let command = komodod_path + config.chain_launch_params + ' -pubkey=' + pubkey
         
         console.log('Launching the daemon... \n' + command)
         let cli = child_process.exec(command)
@@ -362,11 +393,11 @@ function cancelTokenOrder(func, tokenid, txid) {
 
 
 function getCoinName() {
-    return coin_name
+    return config.coin_name
 }
 
 function getChainName() {
-    return chain_name
+    return config.chain_name
 }
 
 
@@ -377,14 +408,14 @@ function getKeyPair() {
 function getKomodoFolder() {
     // macOS
     if(platform === 'darwin') 
-        return os.homedir() + '/Library/Application Support/Komodo/' + chain_name + '/'  
+        return os.homedir() + '/Library/Application Support/Komodo/' + config.chain_name + '/'  
 
     // Windows
     if(platform === 'win32') 
-        return process.env.APPDATA + '\\Komodo\\' + chain_name + '\\' 
+        return process.env.APPDATA + '\\Komodo\\' + config.chain_name + '\\' 
 
     // Probably Linux
-    return os.homedir() + '/.komodo/' + chain_name + '/'  
+    return os.homedir() + '/.komodo/' + config.chain_name + '/'  
 }
 
 module.exports = {
@@ -403,5 +434,6 @@ module.exports = {
     createTokenTradeOrder,
     getTokenOrders,
     fillTokenOrder,
-    cancelTokenOrder
+    cancelTokenOrder,
+    readConfig
 } 

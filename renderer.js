@@ -24,6 +24,8 @@ pages.forEach(page => {
 
 let daemon = require('./api/daemon.js')
 
+daemon.readConfig()
+
 let loading = false
 let preventWindowClose = false
 
