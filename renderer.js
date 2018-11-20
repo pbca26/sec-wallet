@@ -485,9 +485,7 @@ $('#button-new-address').click(event => {
 
 
 
-$('#button-create-token-submit').click(event => {
-    event.preventDefault()
-    
+$('#form-create-token-submit').submit(event => {
     // Close the modal
     $('#modal-create-token').modal('hide')
 
@@ -501,6 +499,8 @@ $('#button-create-token-submit').click(event => {
     daemon.createToken(name, supply, description).then(() => {
         console.log('Created token: ', name, supply, description)
     })
+
+    return false
 });
 
 
