@@ -470,7 +470,7 @@ $('#button-save-pubkey').click(event => {
 
 
 $('#button-new-address').click(event => {
-    event.preventDefault();
+    event.preventDefault()
     
     // Get a new address
     daemon.getNewAddress().then(address => {
@@ -478,7 +478,7 @@ $('#button-new-address').click(event => {
         
         statusAlert(true, addToHistory('Generated a new address: ' + address))
     }).catch(e => {
-        statusAlert(false, addToHistory('Could not generate new address: ' + address))
+        statusAlert(false, 'Could not generate new address: ' + e)
     })
 });
 
@@ -486,7 +486,7 @@ $('#button-new-address').click(event => {
 
 
 $('#button-create-token-submit').click(event => {
-    event.preventDefault();
+    event.preventDefault()
     
     // Close the modal
     $('#modal-create-token').modal('hide')
