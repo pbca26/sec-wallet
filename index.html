@@ -64,23 +64,23 @@
 
             <hr>
 
-            <form>
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text">Address</span>
-                  </div>
-                  <input id="input-token-address" class="form-control" placeholder="Enter the address of recipient">
-                </div>
-      
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text">Amount</span>
-                  </div>
-                  <input id="input-token-amount" type="number" min="0" class="form-control" placeholder="Enter the amount you'll send">
-                </div>
-                  
-                <button id="button-token-send" class="btn btn-info">Send</button>
-              </form>
+
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Address</span>
+              </div>
+              <input id="input-token-address" class="form-control" placeholder="Enter the address of recipient">
+            </div>
+  
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Amount</span>
+              </div>
+              <input id="input-token-amount" type="number" min="0" class="form-control" placeholder="Enter the amount you'll send">
+            </div>
+              
+            <button id="button-token-send" class="btn btn-info">Send</button>
+
           </div>
 
 
@@ -97,23 +97,23 @@
             
             <hr>
             
-            <form>
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">Address</span>
-                </div>
-                <input id="input-address" class="form-control" placeholder="Enter the address of recipient">
-              </div>
 
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">Amount</span>
-                </div>
-                <input id="input-amount" type="number" min="0" class="form-control" placeholder="Enter the amount you'll send">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Address</span>
               </div>
-                
-              <button id="button-send" class="btn btn-info">Send</button>
-            </form>
+              <input id="input-address" class="form-control" placeholder="Enter the address of recipient">
+            </div>
+
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Amount</span>
+              </div>
+              <input id="input-amount" type="number" min="0" class="form-control" placeholder="Enter the amount you'll send">
+            </div>
+              
+            <button id="button-send" class="btn btn-info">Send</button>
+
 
             <hr>
             
@@ -254,23 +254,22 @@
                   <h5 class="modal-title" id="title-enter-password">Enter password</h5>
                 </div>
                 <div class="modal-body">
-                  <form>
-                    <div class="form-group">
-                      <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text">Password</span>
-                        </div>
-                        <input type="password" class="form-control" id="input-password" placeholder="">
-                        <div class="input-group-append">
-                          <button id="button-enter-password-show" type="button" class="btn btn-success my-2 my-sm-0"></button>  
-                        </div>
-                        <div id="div-enter-password-edit" class="input-group-append">
-                          <button id="button-enter-password-edit" type="button" class="btn btn-secondary my-2 my-sm-0">Edit</button>  
-                        </div>
-                        <small id="text-enter-password-small" class="form-text text-muted"></small>
+
+                  <div class="form-group">
+                    <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">Password</span>
                       </div>
+                      <input type="password" class="form-control" id="input-password" placeholder="">
+                      <div class="input-group-append">
+                        <button id="button-enter-password-show" type="button" class="btn btn-success my-2 my-sm-0"></button>  
+                      </div>
+                      <div id="div-enter-password-edit" class="input-group-append">
+                        <button id="button-enter-password-edit" type="button" class="btn btn-secondary my-2 my-sm-0">Edit</button>  
+                      </div>
+                      <small id="text-enter-password-small" class="form-text text-muted"></small>
                     </div>
-                  </form>
+                  </div>
 
                   <div class="alert alert-danger" id="status-alert-password">
                     <button type="button" class="close">×</button>
@@ -302,7 +301,7 @@
                   </button>
                 </div>
                 <div class="modal-body">
-                  <form>
+
                     <div class="form-group">
                       <div class="input-group mb-3">
                         <div class="input-group-prepend">
@@ -314,7 +313,7 @@
                         </small>
                       </div>
                     </div>
-                  </form>
+
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -344,7 +343,7 @@
 
                   <hr>
                   
-                  <form>
+
                       <div class="form-group">
                           <label><strong>First</strong> generated key pair</label>
 
@@ -382,7 +381,7 @@
                             <input type="text" class="form-control" id="text-last-pubkey" disabled>
                           </div>
                       </div>
-                  </form>
+
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -406,7 +405,7 @@
                   </button>
                 </div>
                 <div class="modal-body">
-                  <form>
+
                     <div class="form-group">
                       <div class="input-group mb-3">
                         <div class="input-group-prepend">
@@ -427,7 +426,7 @@
                         <input id="input-create-token-supply" type="number" min="0" class="form-control" placeholder="The amount you'll supply for this token, eg. 0.01">
                       </div>
                     </div>
-                  </form>
+
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -454,7 +453,7 @@
                     </button>
                   </div>
                   <div class="modal-body">
-                    <form>
+
                       <div class="form-group">
                         <div class="input-group mb-3">
                           <div class="input-group-prepend">
@@ -475,7 +474,7 @@
                           <input id="input-token-buy-order-supply" type="number" min="0" class="form-control" placeholder="The count of tokens you will buy">
                         </div>
                       </div>
-                    </form>
+
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -498,7 +497,7 @@
                     </button>
                   </div>
                   <div class="modal-body">
-                    <form>
+
                       <div class="form-group">
                         <div class="input-group mb-3">
                           <div class="input-group-prepend">
@@ -519,7 +518,7 @@
                           <input id="input-token-sell-order-supply" type="number" min="0" class="form-control" placeholder="The count of tokens you will sell">
                         </div>
                       </div>
-                    </form>
+
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -547,7 +546,7 @@
                     </div>
                     <div class="modal-body">
                       <h5 class="modal-title" id="text-token-fill-order-action"></h5>
-                      <form>
+
                         <div class="form-group">
                           <div class="input-group mb-3">
                             <div class="input-group-prepend">
@@ -574,7 +573,7 @@
                             <input id="input-token-fill-order-fill-count" type="number" min="0" class="form-control" placeholder="The count of tokens to fill">
                           </div>
                         </div>
-                      </form>
+
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
