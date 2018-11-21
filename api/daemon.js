@@ -1,8 +1,8 @@
 'use strict'
 
-const fs = require("fs");
-const child_process = require('child_process');
-const keygen = require('./keygen.js');
+const fs = require("fs")
+const child_process = require('child_process')
+const keygen = require('./keygen.js')
 
 const os = require('os')
 const platform = os.platform()
@@ -17,9 +17,15 @@ const default_config = {
 // Data
 let komodod_path = undefined
 let cli_path = undefined
+let cli_args = undefined
 let keypair = undefined 
 let komodod = undefined // This will be the spawned cli komodod object
 let config = undefined
+
+
+function to_cli_args(command) {
+    return (cli_args + ' ' + command).split(' ')
+}
 
 function readConfig() {
     // Set default
@@ -48,13 +54,13 @@ function readConfig() {
 
     console.log('Config: ', config)
 
-    // Refresh other variables
+    // Set binary variables
     komodod_path = config.bin_folder + 'komodod -ac_name=' + config.chain_name + ' '
-    cli_path = config.bin_folder + 'komodo-cli -ac_name=' + config.chain_name + ' '
+    
+    // CLI
+    cli_path = config.bin_folder + 'komodo-cli'
+    cli_args = '-ac_name=' + config.chain_name
 }
-
-
-
 
 function startUp(pubkey) {
     return new Promise((resolve, reject) => {
@@ -106,15 +112,15 @@ function launchDaemon(pubkey) {
 
 
         komodod.stdout.on('data', data => {
-            console.log('stdout: ' + data)
-        });
+            console.log('komodod stdout: ' + data)
+        })
 
         komodod.stderr.on('data', data => {
-            console.log('stderr: ' + data)
-        });
+            console.log('komodod stderr: ' + data)
+        })
 
         // Wait until daemon is ready
-        setTimeout(() => { resolve() }, 3000);
+        setTimeout(() => { resolve() }, 3000)
     })
 }
 
@@ -122,163 +128,185 @@ function launchDaemon(pubkey) {
 function stopDaemon() {
     return new Promise((resolve, reject) => {
         console.log('Stopping the daemon...')
-        child_process.exec(cli_path + 'stop');
+        child_process.execFile(cli_path, to_cli_args('stop'), (error, stdout, stderr) => {
 
-        let timeout = setTimeout(() => { resolve() }, 60000);
-        komodod.on('close', function (code) {
-            console.log('komodod exited with code ' + code);
+            let timeout = setTimeout(() => { resolve() }, 60000)
+            komodod.on('close', code => {
+                console.log('komodod exited with code ' + code)
 
-            clearTimeout(timeout)
+                clearTimeout(timeout)
+                
+                resolve()
+            })
             
-            resolve()
-        });
+        })
     })
 }
 
 function getBalance() {
     return new Promise((resolve, reject) => {
-        const cli = child_process.exec(cli_path + 'getwalletinfo');
+        child_process.execFile(cli_path, to_cli_args('getwalletinfo'), (error, stdout, stderr) => {
 
-        cli.stdout.on('data', data => {
-            resolve(JSON.parse(data).balance)
-        });
+            if(stderr) {
+                console.log('getBalance failed: ', stderr)
+                reject(stderr)
+            }
+
+            if(stdout) {
+                console.log('getBalance: ', stdout)
+                resolve(JSON.parse(stdout).balance)
+            }
+
+        })
     })
 }
 
 function getNewAddress() {
     return new Promise((resolve, reject) => {
-        const cli = child_process.exec(cli_path + 'getnewaddress');
+        child_process.execFile(cli_path, to_cli_args('getnewaddress'), (error, stdout, stderr) => {
 
-        cli.stdout.on('data', data => {
-            resolve(data)
-        });
+            if(stderr) {
+                console.log('getNewAddress failed: ', stderr)
+                reject(stderr)
+            }
 
-        cli.stderr.on('data', data => {
-            console.log('getNewAddress failed: ', data)
-            reject(data)
-        });
+            if(stdout) {
+                resolve(stdout)
+            }
+
+        })
     })
 }
 
 
 function getTokenBalance(id) {
     return new Promise((resolve, reject) => {
-        const cli = child_process.exec(cli_path + 'tokenbalance ' + id);
+        child_process.execFile(cli_path, to_cli_args('tokenbalance ' + id), (error, stdout, stderr) => {
 
-        cli.stdout.on('data', data => {
-            resolve(JSON.parse(data).balance)
-        });
+            if(stderr) {
+                console.log('getTokenBalance failed: ', stderr)
+                reject(stderr)
+            }
 
-        cli.stderr.on('data', data => {
-            console.log('getTokenBalance failed: ', data)
-            reject(data)
-        });
+            if(stdout) {
+                resolve(JSON.parse(stdout).balance)
+            }
+
+        })
     })
 }
 
 function getTokenName(id) {
     return new Promise((resolve, reject) => {
-        const cli = child_process.exec(cli_path + 'tokeninfo ' + id);
+        child_process.execFile(cli_path, to_cli_args('tokeninfo ' + id), (error, stdout, stderr) => {
 
-        cli.stdout.on('data', data => {
-            resolve(JSON.parse(data).name)
-        });
+            if(stderr) {
+                console.log('getTokenName failed: ', stderr)
+                reject(stderr)
+            }
 
-        cli.stderr.on('data', data => {
-            console.log('getTokenName failed: ', data)
-            reject(data)
-        });
+            if(stdout) {
+                resolve(JSON.parse(stdout).name)
+            }
+
+        })
     })
 }
 
 
 function getTokenList() {
     return new Promise((resolve, reject) => {
-        const cli = child_process.exec(cli_path + 'tokenlist');
+        child_process.execFile(cli_path, to_cli_args('tokenlist'), (error, stdout, stderr) => {
 
-        cli.stdout.on('data', tokens => {
-            tokens = JSON.parse(tokens)
-            tokens.forEach((tok, i, arr) => {
-                arr[i] = { id: tok }
-            })
+            if(stderr) {
+                console.log('getTokenList failed: ', stderr)
+                reject(stderr)
+            }
 
+            if(stdout) {
+                let tokens = JSON.parse(stdout)
 
-            // Get token information
-            Promise.all(tokens.map(t => {
-                return new Promise((resolve, reject) => {
-                    // Get name and balance
-                    Promise.all([
-                        getTokenName(t.id).then(name => { t.name = name; }),
-                        getTokenBalance(t.id).then(balance => { t.balance = balance; })                        
-                    ]).then(() => { resolve() })
+                tokens.forEach((tok, i, arr) => {
+                    arr[i] = { id: tok }
                 })
-            })).then(() => { resolve(tokens) })
-        });
+    
+                // Get token information
+                Promise.all(tokens.map(t => {
+                    return new Promise((resolve, reject) => {
+                        // Get name and balance
+                        Promise.all([
+                            getTokenName(t.id).then(name => { t.name = name; }),
+                            getTokenBalance(t.id).then(balance => { t.balance = balance; })                        
+                        ]).then(() => { resolve() })
+                    })
+                })).then(() => { resolve(tokens) })
+            }
 
-
-        cli.stderr.on('data', data => {
-            console.log('getTokenList failed: ', data)
-            reject(data)
-        });
+        })
     })
 }
 
 function getTokenOrders() {
     return new Promise((resolve, reject) => {
-        const cli = child_process.exec(cli_path + 'tokenorders');
+        child_process.execFile(cli_path, to_cli_args('tokenorders'), (error, stdout, stderr) => {
 
-        cli.stdout.on('data', orders => {
-            orders = JSON.parse(orders)
+            if(stderr) {
+                console.log('getTokenOrders failed: ', stderr)
+                reject(stderr)
+            }
 
+            if(stdout) {
+                let orders = JSON.parse(stdout)
+    
+                // Get token information
+                Promise.all(orders.map(t => {
+                    return new Promise((resolve, reject) => {
+                        // Get name and balance
+                        Promise.all([
+                            getTokenName(t.tokenid).then(name => { t.name = name; })                     
+                        ]).then(() => { resolve() })
+                    })
+                })).then(() => { resolve(orders) })
+            }
 
-            // Get token information
-            Promise.all(orders.map(t => {
-                return new Promise((resolve, reject) => {
-                    // Get name and balance
-                    Promise.all([
-                        getTokenName(t.tokenid).then(name => { t.name = name; })                     
-                    ]).then(() => { resolve() })
-                })
-            })).then(() => { resolve(orders) })
-        });
-
-        cli.stderr.on('data', data => {
-            console.log('getTokenOrders failed: ', data)
-            reject(data)
-        });
+        })
     })
 }
 
 function importPrivKey(key) {
     console.log('Importing privkey: ' + key)
     return new Promise((resolve, reject) => {
-        const cli = child_process.exec(cli_path + 'importprivkey ' + key);
+        child_process.execFile(cli_path, to_cli_args('importprivkey ' + key), (error, stdout, stderr) => {
 
-        cli.stdout.on('data', data => {
-            console.log('importprivkey result address: ' + data)
-            resolve(data)
-        });
+            if(stderr) {
+                console.log('importPrivKey failed: ', stderr)
+                reject(stderr)
+            }
 
-        cli.stderr.on('data', data => {
-            console.log('importPrivKey failed: ', data)
-            reject(data)
-        });
+            if(stdout) {
+                console.log('importprivkey result address: ' + stdout)
+                resolve(stdout)
+            }
+
+        })
     })
 }
 
 function getAddressFromPubkey(pubkey) {
     return new Promise((resolve, reject) => {
-        const cli = child_process.exec(cli_path + 'tokenaddress ' + pubkey);
+        child_process.execFile(cli_path, to_cli_args('tokenaddress ' + pubkey), (error, stdout, stderr) => {
 
-        cli.stdout.on('data', data => {
-            let json = JSON.parse(data)
-            resolve({ address: json.myaddress, CCaddress: json.CCaddress, } )
-        });
+            if(stderr) {
+                console.log('getAddressFromPubkey failed: ', stderr)
+                reject(stderr)
+            }
 
-        cli.stderr.on('data', data => {
-            console.log('getAddressFromPubkey failed: ', data)
-            reject(data)
-        });
+            if(stdout) {
+                let json = JSON.parse(stdout)
+                resolve({ address: json.myaddress, CCaddress: json.CCaddress, } )
+            }
+
+        })
     })
 }
 
@@ -287,18 +315,20 @@ function getAddressFromPubkey(pubkey) {
 function sendToAddress(address, amount) {
     return new Promise((resolve, reject) => {
         console.log('Sending ' + amount + ' ' + getCoinName() + ' to ' + address)
-        const cli = child_process.exec(cli_path + 'sendtoaddress ' + address + ' ' + amount);
+        const cli = child_process.execFile(cli_path, to_cli_args('sendtoaddress ' + address + ' ' + amount), (error, stdout, stderr) => {
 
-        cli.stdout.on('data', data => {
-            console.log('sendtoaddress ' + address + ' ' + amount)
-            console.log('txid: ' + data)
-            resolve(data)
-        });
+            if(stderr) {
+                console.log('sendToAddress failed: ', stderr)
+                reject(stderr)
+            }
 
-        cli.stderr.on('data', data => {
-            console.log('sendToAddress failed: ', data)
-            reject(data)
-        });
+            if(stdout) {
+                console.log('sendtoaddress ' + address + ' ' + amount)
+                console.log('txid: ' + stdout)
+                resolve(stdout)
+            }
+
+        })
     })
 }
 
@@ -306,39 +336,44 @@ function sendToAddress(address, amount) {
 
 function broadcastTX(raw_tx) {
     return new Promise((resolve, reject) => {
-        const cli = child_process.exec(cli_path + 'sendrawtransaction ' + raw_tx);
+        child_process.execFile(cli_path, to_cli_args('sendrawtransaction ' + raw_tx), (error, stdout, stderr) => {
 
-        cli.stdout.on('data', data => {
-            console.log('TX-ID result: ' + data)
-            resolve(data)
-        });
+            if(stderr) {
+                console.log('BroadcastTX Failed: ' + stderr)
+                reject(stderr)
+            }
 
-        cli.stderr.on('data', data => {
-            console.log('BroadcastTX Failed: ' + data)
-            reject(data)
-        });
+            if(stdout) {
+                console.log('TX-ID result: ' + stdout)
+                resolve(stdout)
+            }
+
+        })
     })
 }
 
 function sendTokenToAddress(token_id, address, amount) {
     return new Promise((resolve, reject) => {
         console.log('Sending ' + amount + ' of token_id: ' + token_id + ' to ' + address)
-        const cli = child_process.exec(cli_path + 'tokentransfer ' + token_id + ' ' + address + ' ' + amount);
+        child_process.execFile(cli_path, to_cli_args('tokentransfer ' + token_id + ' ' + address + ' ' + amount), (error, stdout, stderr) => {
 
-        cli.stdout.on('data', data => {
-            console.log('tokentransfer ' + address + ' ' + amount)
+            if(stderr) {
+                console.log('sendTokenToAddress failed: ', stderr)
+                reject(stderr)
+            }
 
-            broadcastTX(JSON.parse(data).hex).then(txid => {
-                resolve(txid)
-            }).catch(e => {
-                reject(e)
-            })
-        });
+            if(stdout) {
+                console.log('tokentransfer ' + address + ' ' + amount)
+    
+                broadcastTX(JSON.parse(stdout).hex).then(txid => {
+                    resolve(txid)
+                }).catch(e => {
+                    reject(e)
+                })
+            }
 
-        cli.stderr.on('data', data => {
-            console.log('sendTokenToAddress failed: ', data)
-            reject(data)
-        });
+        })
+
     })
 }
 
@@ -348,25 +383,24 @@ function createToken(name, supply, description) {
     return new Promise((resolve, reject) => {
         console.log('Creating token ' + name + ', supply: ' + supply + ' description: ' + description)
         
-        let command = cli_path + 'tokencreate ' + name + ' ' + supply
-        if(description !== '') command += '\"' + description + '\"'
+        child_process.execFile(cli_path, to_cli_args('tokencreate ' + name + ' ' + supply + 
+                    (description !== '' ? ('\"' + description + '\"') : '')), (error, stdout, stderr) => {
 
-        const cli = child_process.exec(command);
-        
+            if(stderr) {
+                console.log('createToken failed: ', stderr)
+                reject(stderr)
+            }
 
-        cli.stdout.on('data', data => {
-            console.log('Broadcasting tokencreate...')
-            broadcastTX(JSON.parse(data).hex).then(txid => {
-                resolve(txid)
-            }).catch(e => {
-                reject(e)
-            })
-        });
+            if(stdout) {
+                console.log('Broadcasting tokencreate...')
+                broadcastTX(JSON.parse(stdout).hex).then(txid => {
+                    resolve(txid)
+                }).catch(e => {
+                    reject(e)
+                })
+            }
 
-        cli.stderr.on('data', data => {
-            console.log('createToken failed: ', data)
-            reject(data)
-        });
+        })
     })
 }
 
@@ -375,24 +409,24 @@ function createTokenTradeOrder(action, supply, tokenid, price) {
     return new Promise((resolve, reject) => {
         console.log('Creating token buy order supply:' + supply + ', tokenid: ' + tokenid + ', price: ' + price)
         
-        let command = cli_path + 'token' + (action === 'buy' ? 'bid' : 'ask')
-            + ' ' + supply + ' ' + tokenid + ' ' + price
+        child_process.execFile(cli_path, to_cli_args('token' + (action === 'buy' ? 'bid' : 'ask')
+                                            + ' ' + supply + ' ' + tokenid + ' ' + price), (error, stdout, stderr) => {
 
-        const cli = child_process.exec(command);
-        
-        cli.stdout.on('data', data => {
-            console.log('Broadcasting create trade order... ' + action)
-            broadcastTX(JSON.parse(data).hex).then(txid => {
-                resolve(txid)
-            }).catch(e => {
-                reject(e)
-            })
-        });
+            if(stderr) {
+                console.log('createTokenTradeOrder failed: ', stderr)
+                reject(stderr)
+            }
 
-        cli.stderr.on('data', data => {
-            console.log('createTokenTradeOrder failed: ', data)
-            reject(data)
-        });
+            if(stdout) {
+                console.log('Broadcasting create trade order... ' + action)
+                broadcastTX(JSON.parse(stdout).hex).then(txid => {
+                    resolve(txid)
+                }).catch(e => {
+                    reject(e)
+                })
+            }
+
+        })
     })
 }
 
@@ -400,25 +434,24 @@ function fillTokenOrder(func, tokenid, txid, count) {
     return new Promise((resolve, reject) => {
         console.log('Filling order token order:' + func + ', tokenid: ' + tokenid + ', txid: ' + txid + ' count: ' + count)
         
-        let command = cli_path + 'tokenfill' + (func === 'buy' ? 'ask' : 'bid')
-            + ' ' + tokenid + ' ' + txid + ' ' + count
+        child_process.execFile(cli_path, to_cli_args('tokenfill' + (func === 'buy' ? 'ask' : 'bid')
+                                            + ' ' + tokenid + ' ' + txid + ' ' + count), (error, stdout, stderr) => {
 
-        console.log(command)
-        const cli = child_process.exec(command);
-        
-        cli.stdout.on('data', data => {
-            console.log('Broadcasting fill order... ' + func)
-            broadcastTX(JSON.parse(data).hex).then(txid => {
-                resolve(txid)
-            }).catch(e => {
-                reject(e)
-            })
-        });
+            if(stderr) {
+                console.log('fillTokenOrder failed: ', stderr)
+                reject(stderr)
+            }
 
-        cli.stderr.on('data', data => {
-            console.log('fillTokenOrder failed: ', data)
-            reject(data)
-        });
+            if(stdout) {
+                console.log('Broadcasting fill order... ' + func)
+                broadcastTX(JSON.parse(stdout).hex).then(txid => {
+                    resolve(txid)
+                }).catch(e => {
+                    reject(e)
+                })
+            }
+
+        })
     })
 }
 
@@ -426,24 +459,23 @@ function cancelTokenOrder(func, tokenid, txid) {
     return new Promise((resolve, reject) => {
         console.log('Cancelling order token order:' + func + ', tokenid: ' + tokenid + ', txid: ' + txid)
         
-        let command = cli_path + 'tokencancel' + func + ' ' + tokenid + ' ' + txid
+        const cli = child_process.execFile(cli_path, to_cli_args('tokencancel' + func + ' ' + tokenid + ' ' + txid), (error, stdout, stderr) => {
 
-        console.log(command)
-        const cli = child_process.exec(command);
-        
-        cli.stdout.on('data', data => {
-            console.log('Broadcasting cancel order... ' + func)
-            broadcastTX(JSON.parse(data).hex).then(txid => {
-                resolve(txid)
-            }).catch(e => {
-                reject(e)
-            })
-        });
+            if(stderr) {
+                console.log('cancelTokenOrder failed: ', stderr)
+                reject(stderr)
+            }
 
-        cli.stderr.on('data', data => {
-            console.log('cancelTokenOrder failed: ', data)
-            reject(data)
-        });
+            if(stdout) {
+                console.log('Broadcasting cancel order... ' + func)
+                broadcastTX(JSON.parse(stdout).hex).then(txid => {
+                    resolve(txid)
+                }).catch(e => {
+                    reject(e)
+                })
+            }
+            
+        })
     })
 }
 
