@@ -126,9 +126,10 @@ function launchDaemon(pubkey) {
             }
         })
 
-        // komodod.stderr.on('data', data => {
-        //     console.log('komodod stderr: ' + data)
-        // })
+        komodod.stderr.on('data', data => {
+            // This has to be on, daemon doesn't work properly if you don't listen stderr
+            //console.log('komodod stderr: ' + data)
+        })
     })
 }
 

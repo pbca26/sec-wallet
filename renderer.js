@@ -578,8 +578,11 @@ actions.forEach(action => {
         }
         
         // Create token
-        daemon.createTokenTradeOrder(action, supply, tokenid, price).then(() => {
-            console.log('Created token ' + action + ' order: ', supply, tokenid, price)
+        daemon.createTokenTradeOrder(action, supply, tokenid, price).then(() => {            
+            statusAlert(true, addToHistory('Created token ' + action + ' order. Supply: ' + supply +
+                                ', Price: ' + price + ', Transaction ID: ' + tokenid))
+        }).catch(e => {
+            statusAlert(false, 'Could not create token trade order: ' + e)
         })
 
         return false
