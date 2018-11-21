@@ -139,6 +139,7 @@ function getNewAddress() {
         });
 
         cli.stderr.on('data', data => {
+            console.log('getNewAddress failed: ', data)
             reject(data)
         });
     })
@@ -152,6 +153,11 @@ function getTokenBalance(id) {
         cli.stdout.on('data', data => {
             resolve(JSON.parse(data).balance)
         });
+
+        cli.stderr.on('data', data => {
+            console.log('getTokenBalance failed: ', data)
+            reject(data)
+        });
     })
 }
 
@@ -161,6 +167,11 @@ function getTokenName(id) {
 
         cli.stdout.on('data', data => {
             resolve(JSON.parse(data).name)
+        });
+
+        cli.stderr.on('data', data => {
+            console.log('getTokenName failed: ', data)
+            reject(data)
         });
     })
 }
@@ -188,6 +199,12 @@ function getTokenList() {
                 })
             })).then(() => { resolve(tokens) })
         });
+
+
+        cli.stderr.on('data', data => {
+            console.log('getTokenList failed: ', data)
+            reject(data)
+        });
     })
 }
 
@@ -209,6 +226,11 @@ function getTokenOrders() {
                 })
             })).then(() => { resolve(orders) })
         });
+
+        cli.stderr.on('data', data => {
+            console.log('getTokenOrders failed: ', data)
+            reject(data)
+        });
     })
 }
 
@@ -221,6 +243,11 @@ function importPrivKey(key) {
             console.log('importprivkey result address: ' + data)
             resolve(data)
         });
+
+        cli.stderr.on('data', data => {
+            console.log('importPrivKey failed: ', data)
+            reject(data)
+        });
     })
 }
 
@@ -231,6 +258,11 @@ function getAddressFromPubkey(pubkey) {
         cli.stdout.on('data', data => {
             let json = JSON.parse(data)
             resolve({ address: json.myaddress, CCaddress: json.CCaddress, } )
+        });
+
+        cli.stderr.on('data', data => {
+            console.log('getAddressFromPubkey failed: ', data)
+            reject(data)
         });
     })
 }
@@ -248,8 +280,8 @@ function sendToAddress(address, amount) {
             resolve(data)
         });
 
-
         cli.stderr.on('data', data => {
+            console.log('sendToAddress failed: ', data)
             reject(data)
         });
     })
@@ -267,7 +299,7 @@ function broadcastTX(raw_tx) {
         });
 
         cli.stderr.on('data', data => {
-            console.log('Broadcast Failed: ' + data)
+            console.log('BroadcastTX Failed: ' + data)
             reject(data)
         });
     })
@@ -289,6 +321,7 @@ function sendTokenToAddress(token_id, address, amount) {
         });
 
         cli.stderr.on('data', data => {
+            console.log('sendTokenToAddress failed: ', data)
             reject(data)
         });
     })
@@ -316,6 +349,7 @@ function createToken(name, supply, description) {
         });
 
         cli.stderr.on('data', data => {
+            console.log('createToken failed: ', data)
             reject(data)
         });
     })
@@ -341,6 +375,7 @@ function createTokenTradeOrder(action, supply, tokenid, price) {
         });
 
         cli.stderr.on('data', data => {
+            console.log('createTokenTradeOrder failed: ', data)
             reject(data)
         });
     })
@@ -366,6 +401,7 @@ function fillTokenOrder(func, tokenid, txid, count) {
         });
 
         cli.stderr.on('data', data => {
+            console.log('fillTokenOrder failed: ', data)
             reject(data)
         });
     })
@@ -390,6 +426,7 @@ function cancelTokenOrder(func, tokenid, txid) {
         });
 
         cli.stderr.on('data', data => {
+            console.log('cancelTokenOrder failed: ', data)
             reject(data)
         });
     })
