@@ -515,7 +515,6 @@ $('#form-create-token-submit').submit(event => {
     // Close the modal
     $('#modal-create-token').modal('hide')
 
-    // TODO: Validate inputs 
     let name = $('#input-create-token-name').val()
     let supply = $('#input-create-token-supply').val()
     let description = $('#input-create-token-description').val()
@@ -547,9 +546,7 @@ $('#form-create-token-submit').submit(event => {
 
 // Create buy / sell orders
 ['buy', 'sell'].forEach(action => {
-    $('#button-token-'+ action +'-order-submit').click(event => {
-        event.preventDefault();
-        
+    $('#form-token-'+ action +'-order-submit').submit(event => {
         // Close the modal
         $('#modal-token-' + action +'-order').modal('hide')
     
@@ -562,6 +559,8 @@ $('#form-create-token-submit').submit(event => {
         daemon.createTokenTradeOrder(action, supply, tokenid, price).then(() => {
             console.log('Created token ' + action + ' order: ', supply, tokenid, price)
         })
+
+        return false
     });
 })
 

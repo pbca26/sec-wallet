@@ -457,34 +457,36 @@
                       <span aria-hidden="true">&times;</span>
                     </button>
                   </div>
-                  <div class="modal-body">
 
-                      <div class="form-group">
-                        <div class="input-group mb-3">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">Token</span>
+                  <form id="form-token-buy-order-submit">
+                    <div class="modal-body">
+                        <div class="form-group">
+                          <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text">Token</span>
+                            </div>
+                            <select class="custom-select" id="select-token-buy-order"></select>
                           </div>
-                          <select class="custom-select" id="select-token-buy-order"></select>
-                        </div>
-                        <div class="input-group mb-3">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">Price</span>
+                          <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text">Price</span>
+                            </div>
+                            <input id="input-token-buy-order-price" type="number" min="0" step="any" class="form-control" placeholder="Price you will pay for each token" required>
                           </div>
-                          <input id="input-token-buy-order-price" type="number" min="0" step="any" class="form-control" placeholder="Price you will pay for each token" required>
-                        </div>
-                        <div class="input-group mb-3">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">Count</span>
+                          <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text">Count</span>
+                            </div>
+                            <input id="input-token-buy-order-supply" type="number" min="1" step="1" class="form-control" placeholder="The count of tokens you will buy" required>
                           </div>
-                          <input id="input-token-buy-order-supply" type="number" min="1" step="1" class="form-control" placeholder="The count of tokens you will buy" required>
                         </div>
-                      </div>
+                    </div>
 
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button id="button-token-buy-order-submit" type="button" class="btn btn-info">Submit</button>
-                  </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                      <button id="button-token-buy-order-submit" type="submit" class="btn btn-info">Submit</button>
+                    </div>
+                  </form>
                 </div>
               </div>
             </div>
@@ -501,34 +503,36 @@
                       <span aria-hidden="true">&times;</span>
                     </button>
                   </div>
-                  <div class="modal-body">
 
-                      <div class="form-group">
-                        <div class="input-group mb-3">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">Token</span>
+                  <form id="form-token-sell-order-submit">
+                    <div class="modal-body">
+                        <div class="form-group">
+                          <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text">Token</span>
+                            </div>
+                            <select class="custom-select" id="select-token-sell-order"></select>
                           </div>
-                          <select class="custom-select" id="select-token-sell-order"></select>
-                        </div>
-                        <div class="input-group mb-3">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">Price</span>
+                          <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text">Price</span>
+                            </div>
+                            <input id="input-token-sell-order-price" type="number" min="0" step="any" class="form-control" placeholder="Price you ask for each token" required>
                           </div>
-                          <input id="input-token-sell-order-price" type="number" min="0" step="any" class="form-control" placeholder="Price you ask for each token" required>
-                        </div>
-                        <div class="input-group mb-3">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">Count</span>
+                          <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text">Count</span>
+                            </div>
+                            <input id="input-token-sell-order-supply" type="number" min="1" step="1" class="form-control" placeholder="The count of tokens you will sell" required>
                           </div>
-                          <input id="input-token-sell-order-supply" type="number" min="1" step="1" class="form-control" placeholder="The count of tokens you will sell" required>
                         </div>
-                      </div>
+                    </div>
 
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button id="button-token-sell-order-submit" type="button" class="btn btn-info">Submit</button>
-                  </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                      <button id="button-token-sell-order-submit" type="submit" class="btn btn-info">Submit</button>
+                    </div>
+                  </form>
                 </div>
               </div>
             </div>
