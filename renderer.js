@@ -438,6 +438,9 @@ function addToHistory(text) {
     let curr_text = thistory.val()
     thistory.val(curr_text + (curr_text === '' ? '' : '\n') + text)
 
+    // Scroll to bottom
+    thistory.scrollTop(thistory[0].scrollHeight)
+
     return text
 }
 
