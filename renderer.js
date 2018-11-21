@@ -424,9 +424,7 @@ function statusAlert(success, text) {
 }
 
 function addTransactionToHistory(address, amount, asset_name, extra='') {
-    var time = new Date().toTimeString().substr(0,8)
-
-    let transaction_text = time + ' - Sent ' + amount + ' ' + asset_name + ' to ' + address;
+    let transaction_text = 'Sent ' + amount + ' ' + asset_name + ' to ' + address + ' ' + extra;
 
     addToHistory(transaction_text)
     
@@ -436,6 +434,11 @@ function addTransactionToHistory(address, amount, asset_name, extra='') {
 function addToHistory(text) {
     let thistory = $('#textarea-history')
     let curr_text = thistory.val()
+    
+    var time = new Date().toTimeString().substr(0, 8)
+
+    text = time + ' - ' + text
+
     thistory.val(curr_text + (curr_text === '' ? '' : '\n') + text)
 
     // Scroll to bottom
