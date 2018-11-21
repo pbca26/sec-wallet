@@ -387,8 +387,10 @@ function createToken(name, supply, description) {
     return new Promise((resolve, reject) => {
         console.log('Creating token ' + name + ', supply: ' + supply + ' description: ' + description)
         
-        child_process.execFile(cli_path, to_cli_args('tokencreate ' + name + ' ' + supply + 
-                    (description !== '' ? ('\"' + description + '\"') : '')), (error, stdout, stderr) => {
+        let args = to_cli_args('tokencreate ' + name + ' ' + supply)
+        if(description !== '') args.push('"' + description + '"')
+
+        child_process.execFile(cli_path, args, (error, stdout, stderr) => {
 
             if(stderr) {
                 console.log('createToken failed: ', stderr)

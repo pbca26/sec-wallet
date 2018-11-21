@@ -379,7 +379,7 @@ $('#form-token-send').submit(event => {
 
     // Validate inputs
     if(token_balance < amount) {
-        statusAlert(false, 'Not enough tokens, if you are sure you have it, wait until the balance is refreshed.')
+        statusAlert(false, 'Failed to send: Not enough tokens. Yet, if you are sure you have it, please wait until the balance is refreshed.')
         return false
     }
 
@@ -503,11 +503,25 @@ $('#form-create-token-submit').submit(event => {
     let name = $('#input-create-token-name').val()
     let supply = $('#input-create-token-supply').val()
     let description = $('#input-create-token-description').val()
+
+    // Validate inputs 
+    if(parseFloat(supply) === 0) {
+        statusAlert(false, 'Failed to create token: Supply can\'t be zero.')
+        return false
+    }
     
+    if(name.indexOf(' ') !== -1) {
+        statusAlert(false, 'Failed to create token: Name can\'t have spaces.')
+        return false
+    }
 
     // Create token
     daemon.createToken(name, supply, description).then(() => {
-        console.log('Created token: ', name, supply, description)
+        statusAlert(true, addToHistory('Created token ' + name + 
+                                (description !== '' ? ('(' + description + ')') : '')
+                                + ' with ' +  supply + ' ' + daemon.getCoinName()))
+    }).catch(e => {
+        statusAlert(false, 'Failed to create token: ' + e)
     })
 
     return false
