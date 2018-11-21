@@ -117,6 +117,11 @@ function launchDaemon(pubkey) {
             if(data.indexOf('init message: Done loading') !== -1) {
                 resolve()
             }
+
+            // If komodod is closed, let stopDaemon function know about it
+            if(data.indexOf('Shutdown: done') !== -1) {
+                komodod.emit('close', 0)
+            }
         })
 
         // komodod.stderr.on('data', data => {
@@ -132,9 +137,8 @@ function stopDaemon() {
         child_process.execFile(cli_path, to_cli_args('stop'), (error, stdout, stderr) => {
 
             let timeout = setTimeout(() => { resolve() }, 60000)
-            komodod.on('close', code => {
-                console.log('komodod exited with code ' + code)
 
+            komodod.on('close', code => {
                 clearTimeout(timeout)
                 
                 resolve()
