@@ -481,7 +481,22 @@ $('#form-save-pubkey').submit(event => {
 
     // TODO: Validate inputs 
     let new_pubkey = $('#input-pubkey').val()
-    
+
+    // Check if it's correct size
+    if(new_pubkey.length !== 0 && new_pubkey.length !== 66) {
+        statusAlert(false, 'Failed to change Public key: It should be 66 bytes.') 
+        return false
+    }
+
+    // Check if it starts with 02 or 03
+    if(new_pubkey.length !== 0) {
+        let first_two_chars = new_pubkey.slice(0, 2)
+        if(first_two_chars !== '02' && first_two_chars !== '03') {
+            statusAlert(false, 'Failed to change Public key: Invalid format, it should start with 02 or 03.') 
+            return false
+        }
+    }
+
     if(new_pubkey !== daemon.getKeyPair().pubkey) {
         // Restart the daemon
         stopAll('Restarting the daemon...').then(() => {
