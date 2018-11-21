@@ -591,7 +591,6 @@ function updateTokenLists() {
 // Update token list
 function updateTokenOrders() {
     return daemon.getTokenOrders().then(list => {
-        console.log('TOKEN ORDERS: ', list)
         // Remove all
         $('#table-token-buy').children().remove()
         $('#table-token-sell').children().remove()

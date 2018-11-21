@@ -10,7 +10,7 @@ let config = {}
 let komodod_path = ''
 let cli_path = ''
 let keypair = undefined 
-let komodod_cli = undefined // This will be the komodod object
+let komodod = undefined // This will be the komodod object
 
 function readConfig() {
     // Set default
@@ -98,14 +98,14 @@ function launchDaemon(pubkey) {
         let program = args.shift()
 
         console.log('Launching the daemon... \n' + command)
-        komodod_cli = child_process.spawn(program, args)
+        komodod = child_process.spawn(program, args)
 
 
-        komodod_cli.stdout.on('data', data => {
+        komodod.stdout.on('data', data => {
             console.log('stdout: ' + data)
         });
 
-        komodod_cli.stderr.on('data', data => {
+        komodod.stderr.on('data', data => {
             console.log('stderr: ' + data)
         });
 
@@ -121,7 +121,7 @@ function stopDaemon() {
         child_process.exec(cli_path + 'stop');
 
         let timeout = setTimeout(() => { resolve() }, 60000);
-        komodod_cli.on('close', function (code) {
+        komodod.on('close', function (code) {
             console.log('komodod exited with code ' + code);
 
             clearTimeout(timeout)
