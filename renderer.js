@@ -479,7 +479,6 @@ $('#form-save-pubkey').submit(event => {
     // Close the modal
     $('#modal-change-pubkey').modal('hide')
 
-    // TODO: Validate inputs 
     let new_pubkey = $('#input-pubkey').val()
 
     // Check if it's correct size
@@ -566,7 +565,7 @@ actions.forEach(action => {
         // Close the modal
         $('#modal-token-' + action +'-order').modal('hide')
     
-        // TODO: Validate inputs 
+        let balance = $('option:selected', $('#select-token-' + action + '-order')).attr('data-balance')
         let tokenid = $('#select-token-' + action + '-order').val()
         let price = $('#input-token-' + action + '-order-price').val()
         let supply = $('#input-token-' + action + '-order-supply').val()
@@ -576,6 +575,12 @@ actions.forEach(action => {
             statusAlert(false, 'Failed to create order: Price can\'t be zero.')
             return false
         }
+        
+        if(action === 'sell' && parseInt(supply) > parseInt(balance)) {
+            statusAlert(false, 'Failed to create order: Not enough tokens.')
+            return false
+        }
+        
         
         // Create token
         daemon.createTokenTradeOrder(action, supply, tokenid, price).then(() => {            
@@ -641,7 +646,8 @@ function updateTokenLists() {
 
             // Add new ones
             for(var i = 0; i < list.length; ++i) {
-                $(s).append('<option value="' + list[i].id + '">' + list[i].name + ' - ' + list[i].balance + '</option>')
+                $(s).append('<option value="' + list[i].id + '" data-balance="' + list[i].balance + '">' + 
+                                list[i].name + ' - ' + list[i].balance + '</option>')
             }
 
             // Remember the selection
