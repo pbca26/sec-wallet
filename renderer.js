@@ -348,7 +348,11 @@ $('.alert .close').on('click', function(e) {
 $('#form-send').submit(event => {    
     let address = $('#input-address').val()
     let amount = $('#input-amount').val()
-    // TODO: Validate inputs 
+    // Validate inputs 
+    if(parseFloat(amount) === 0) {
+        statusAlert(false, 'Failed to send: Amount can\'t be zero.')
+        return false
+    }
 
     // Send to address
     daemon.sendToAddress(address, amount).then(() => {
