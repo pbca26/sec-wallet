@@ -1,9 +1,18 @@
+'use strict'
+
 const fs = require("fs");
 const child_process = require('child_process');
 const keygen = require('./keygen.js');
 
 const os = require('os')
 const platform = os.platform()
+
+const default_config = {
+    bin_folder: os.homedir() + '/Documents/komodo/src/',
+    chain_name: 'NAE',
+    coin_name: 'NAE',
+    chain_launch_params: '-ac_supply=100000 -addnode=95.216.196.64 -ac_cc=1337'
+}
 
 // Data
 let config = {}
@@ -14,12 +23,7 @@ let komodod = undefined // This will be the komodod object
 
 function readConfig() {
     // Set default
-    config = {
-        bin_folder: os.homedir() + '/Documents/komodo/src/',
-        chain_name: 'NAE',
-        coin_name: 'NAE',
-        chain_launch_params: '-ac_supply=100000 -addnode=95.216.196.64 -ac_cc=1337'
-    }
+    config = { ...default_config }
 
     const config_path = getKomodoFolder() + 'gui_config.json'
     try {
