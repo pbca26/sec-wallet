@@ -345,46 +345,45 @@
 
                   <hr>
                   
+                  <div class="form-group">
+                    <label><strong>First</strong> generated key pair</label>
 
-                      <div class="form-group">
-                          <label><strong>First</strong> generated key pair</label>
-
-                          <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                              <span class="input-group-text">Private</span>
-                            </div>
-                            <input type="text" class="form-control" id="text-first-privkey" disabled>
-                          </div>
-                          
-                          <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                              <span class="input-group-text">Public</span>
-                            </div>
-                            <input type="text" class="form-control" id="text-first-pubkey" disabled>
-                          </div>
+                    <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">Private</span>
                       </div>
-                      
-                      <hr>
-
-                      <div class="form-group">
-                          <label><strong>Last</strong> generated key pair</label>
-
-                          <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                              <span class="input-group-text">Private</span>
-                            </div>
-                            <input type="text" class="form-control" id="text-last-privkey" disabled>
-                          </div>
-
-                          <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                              <span class="input-group-text">Public</span>
-                            </div>
-                            <input type="text" class="form-control" id="text-last-pubkey" disabled>
-                          </div>
+                      <input type="text" class="form-control" id="text-first-privkey" disabled>
+                    </div>
+                    
+                    <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">Public</span>
                       </div>
+                      <input type="text" class="form-control" id="text-first-pubkey" disabled>
+                    </div>
+                  </div>
+                  
+                  <hr>
 
+                  <div class="form-group">
+                    <label><strong>Last</strong> generated key pair</label>
+
+                    <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">Private</span>
+                      </div>
+                      <input type="text" class="form-control" id="text-last-privkey" disabled>
+                    </div>
+
+                    <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">Public</span>
+                      </div>
+                      <input type="text" class="form-control" id="text-last-pubkey" disabled>
+                    </div>
+                  </div>
                 </div>
+
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
@@ -400,38 +399,37 @@
           <div class="modal fade" id="modal-create-token" tabindex="-1" role="dialog" aria-labelledby="title-create-token" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
               <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="title-create-token">Create a new Token</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
 
                 <form id="form-create-token-submit">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="title-create-token">Create a new Token</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
                   <div class="modal-body">
-
-                      <div class="form-group">
-                        <div class="input-group mb-3">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">Name</span>
-                          </div>
-                          <input type="text" class="form-control" id="input-create-token-name"  placeholder="A short name for the token, eg. TOK" required>
+                    <div class="form-group">
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">Name</span>
                         </div>
-                        <div class="input-group mb-3">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">Description</span>
-                          </div>
-                          <input type="text" class="form-control" id="input-create-token-description" placeholder="Information about your token">
-                        </div>
-                        <div class="input-group mb-3">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">Supply</span>
-                          </div>
-                          <input id="input-create-token-supply" type="number" min="0" step="any" class="form-control" placeholder="The amount you'll supply for this token, eg. 0.01" required>
-                        </div>
+                        <input type="text" class="form-control" id="input-create-token-name"  placeholder="A short name for the token, eg. TOK" required>
                       </div>
-
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">Description</span>
+                        </div>
+                        <input type="text" class="form-control" id="input-create-token-description" placeholder="Information about your token">
+                      </div>
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">Supply</span>
+                        </div>
+                        <input id="input-create-token-supply" type="number" min="0" step="any" class="form-control" placeholder="The amount you'll supply for this token, eg. 0.01" required>
+                      </div>
+                    </div>
                   </div>
+
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                     <button id="button-create-token-submit" type="submit" class="btn btn-info">Submit</button>
@@ -506,26 +504,26 @@
 
                   <form id="form-token-sell-order-submit">
                     <div class="modal-body">
-                        <div class="form-group">
-                          <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                              <span class="input-group-text">Token</span>
-                            </div>
-                            <select class="custom-select" id="select-token-sell-order"></select>
+                      <div class="form-group">
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text">Token</span>
                           </div>
-                          <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                              <span class="input-group-text">Price</span>
-                            </div>
-                            <input id="input-token-sell-order-price" type="number" min="0" step="any" class="form-control" placeholder="Price you ask for each token" required>
-                          </div>
-                          <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                              <span class="input-group-text">Count</span>
-                            </div>
-                            <input id="input-token-sell-order-supply" type="number" min="1" step="1" class="form-control" placeholder="The count of tokens you will sell" required>
-                          </div>
+                          <select class="custom-select" id="select-token-sell-order"></select>
                         </div>
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text">Price</span>
+                          </div>
+                          <input id="input-token-sell-order-price" type="number" min="0" step="any" class="form-control" placeholder="Price you ask for each token" required>
+                        </div>
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text">Count</span>
+                          </div>
+                          <input id="input-token-sell-order-supply" type="number" min="1" step="1" class="form-control" placeholder="The count of tokens you will sell" required>
+                        </div>
+                      </div>
                     </div>
 
                     <div class="modal-footer">
