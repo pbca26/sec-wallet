@@ -368,11 +368,20 @@ $('#form-send').submit(event => {
 
 
 $('#form-token-send').submit(event => {
-    let token_name = $('#select-tokens option:selected').text()
+    let token_line = $('#select-tokens option:selected').text()
     let token_id = $('#select-tokens').val()
     let address = $('#input-token-address').val()
     let amount = $('#input-token-amount').val()
-    // TODO: Validate inputs 
+
+    let line_arr = token_line.split(' ')
+    let token_name = line_arr[0] 
+    let token_balance = line_arr[line_arr.length-1] 
+
+    // Validate inputs
+    if(token_balance < amount) {
+        statusAlert(false, 'Not enough tokens, if you are sure you have it, wait until the balance is refreshed.')
+        return false
+    }
 
     // Send to address
     daemon.sendTokenToAddress(token_id, address, amount).then(txid => {
