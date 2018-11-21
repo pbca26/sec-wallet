@@ -14,8 +14,8 @@ openPage(pages[0])
 pages.forEach(page => {
     $('#nav-' + page).on('click', function(e) {
         openPage(page)
-    });
-});
+    })
+})
 ////// SET PAGES
 
 
@@ -68,7 +68,7 @@ mainWindow.on('close', e => {
 
 
 function stopAll(loading_text) {
-    inputLock(true, loading_text);
+    inputLock(true, loading_text)
     return new Promise((resolve, reject) => {
         stopUpdateIntervals()
         daemon.stopDaemon().then(() => {
@@ -84,7 +84,7 @@ function stopAll(loading_text) {
 
 
 // User data
-let Store = require('./api/store.js');
+let Store = require('./api/store.js')
 let store = new Store({
   configName: 'user-data',
   defaults: {
@@ -96,7 +96,7 @@ let store = new Store({
 
     pubkey: '',
   }
-});
+})
 
 
 
@@ -105,9 +105,9 @@ let store = new Store({
 // wallet.dat encryption/decryption
 const wallet_dat_path = daemon.getKomodoFolder() + 'wallet.dat'
 
-const { Safe } = require("./api/safe.js");
+const { Safe } = require("./api/safe.js")
 
-var safe = new Safe(wallet_dat_path);
+var safe = new Safe(wallet_dat_path)
 
 // safe.setPassword('papapa')
 // safe.encrypt({kek:'kekkeri'})
@@ -194,7 +194,7 @@ function tryDecrypt(password) {
             console.log('Unknown error: ' + e.message + ' for => '+  wallet_dat_path)
             return 'Unknown error'
         }
-    });
+    })
 }
 
 function tryEncrypt(password) {
@@ -210,32 +210,32 @@ function tryEncrypt(password) {
         return d
     }).catch(e => {
         return e
-    });
+    })
 }
 
 function hidePassword() {    
-    $('#input-password').attr("type", "password");
+    $('#input-password').attr("type", "password")
     $('#button-enter-password-show').html('Show')
 }
 
 // Toggle password visibility
 $('#button-enter-password-show').on('click', function() {
-    event.preventDefault();
+    event.preventDefault()
 
     let pass = $('#input-password')
     
-    let type = pass.attr("type"); 
+    let type = pass.attr("type") 
 
     if(type === 'password'){
-        pass.attr("type", "text");
+        pass.attr("type", "text")
         $('#button-enter-password-show').html('Hide')
     }
     else hidePassword()
-});
+})
 
 // Toggle password edit
 $('#button-enter-password-edit').click(event => {
-    event.preventDefault();
+    event.preventDefault()
     
     $('#input-password').attr('disabled', !$('#input-password').attr('disabled'))
 })
@@ -265,7 +265,7 @@ function promptPasswordScreen(type) {
 }
 
 $('#button-submit-password').click(event => {
-    event.preventDefault();
+    event.preventDefault()
 
     // TODO: Validate inputs 
     let password = $('#input-password').val()
@@ -274,13 +274,13 @@ $('#button-submit-password').click(event => {
     console.log('action:' + action + '  password: ' + password)
 
     // Hide the error
-    $("#status-alert-password").hide();
+    $("#status-alert-password").hide()
     
     // Try decrypting
     if(action === 'decrypt') {
         tryDecrypt(password).then(result => {
             if(result === 'enter_password') {
-                $("#status-alert-password").show();
+                $("#status-alert-password").show()
             }
             // Successfull decryption
             else {
@@ -300,12 +300,12 @@ $('#button-submit-password').click(event => {
             mainWindow.close()
         })
     }
-});
+})
 
 
 function init(pubkey) {
     return new Promise((resolve, reject) => {
-        inputLock(true, 'Preparing the daemon.');
+        inputLock(true, 'Preparing the daemon.')
 
         // Launch daemon 
         daemon.startUp(pubkey).then(wallet => {
@@ -347,10 +347,10 @@ function init(pubkey) {
 }
 
 
-$('.alert').hide();
+$('.alert').hide()
 $('.alert .close').on('click', function(e) {
-    $(this).parent().hide();
-});
+    $(this).parent().hide()
+})
 
 $('#form-send').submit(event => {    
     let address = $('#input-address').val()
@@ -410,7 +410,7 @@ $('#form-token-send').submit(event => {
 })
 
 function statusAlert(success, text) {
-    $('#status-text').html(text);
+    $('#status-text').html(text)
     
     if(success) {
         // Remove danger
@@ -427,7 +427,7 @@ function statusAlert(success, text) {
 
     console.log(text)
 
-    $("#status-alert").show();
+    $("#status-alert").show()
 }
 
 function addTransactionToHistory(address, amount, asset_name, extra='') {
@@ -456,28 +456,26 @@ function addToHistory(text) {
 
 
 $('#button-show-keys').click(event => {
-    event.preventDefault();
+    event.preventDefault()
 
     $('#text-first-privkey').val(store.get('first_privkey'))
     $('#text-first-pubkey').val(store.get('first_pubkey'))
 
     $('#text-last-privkey').val(store.get('generated_privkey'))
     $('#text-last-pubkey').val(store.get('generated_pubkey'))
-});
+})
 
 
 
 
 $('#button-change-pubkey').click(event => {
-    event.preventDefault();
+    event.preventDefault()
 
     // TODO: Validate inputs 
     $('#input-pubkey').val(daemon.getKeyPair().pubkey)
-});
+})
 
-$('#button-save-pubkey').click(event => {
-    event.preventDefault();
-    
+$('#form-save-pubkey').submit(event => {
     // Close the modal
     $('#modal-change-pubkey').modal('hide')
 
@@ -492,7 +490,9 @@ $('#button-save-pubkey').click(event => {
             })
         })
     }
-});
+
+    return false
+})
 
 
 $('#button-new-address').click(event => {
@@ -506,7 +506,7 @@ $('#button-new-address').click(event => {
     }).catch(e => {
         statusAlert(false, 'Could not generate new address: ' + e)
     })
-});
+})
 
 
 
@@ -540,7 +540,7 @@ $('#form-create-token-submit').submit(event => {
     })
 
     return false
-});
+})
 
 
 
@@ -561,7 +561,7 @@ $('#form-create-token-submit').submit(event => {
         })
 
         return false
-    });
+    })
 })
 
 
@@ -570,11 +570,11 @@ $('#form-create-token-submit').submit(event => {
 function inputLock(toggle, message='') {
     setLoading(toggle)
 
-    $('#button-send').prop('disabled', toggle);
-    $('#button-new-address').prop('disabled', toggle);
-    $('#button-change-pubkey').prop('disabled', toggle);
-    $('#button-save-pubkey').prop('disabled', toggle);
-    $('#button-show-keys').prop('disabled', toggle);
+    $('#button-send').prop('disabled', toggle)
+    $('#button-new-address').prop('disabled', toggle)
+    $('#button-change-pubkey').prop('disabled', toggle)
+    $('#button-save-pubkey').prop('disabled', toggle)
+    $('#button-show-keys').prop('disabled', toggle)
 
     if(toggle) {
         $("#loader-txt").html(message)
@@ -583,10 +583,10 @@ function inputLock(toggle, message='') {
             backdrop: "static", // Remove ability to close modal with click
             keyboard: false, // Remove option to close with keyboard
             show: true // Display loader!
-        });
+        })
     }
     else {
-        $("#loader").modal("hide");
+        $("#loader").modal("hide")
     }
 }
 
@@ -616,12 +616,12 @@ function updateTokenLists() {
 
             // Add new ones
             for(var i = 0; i < list.length; ++i) {
-                $(s).append('<option value="' + list[i].id + '">' + list[i].name + ' - ' + list[i].balance + '</option>');
+                $(s).append('<option value="' + list[i].id + '">' + list[i].name + ' - ' + list[i].balance + '</option>')
             }
 
             // Remember the selection
-            if(curr_selected !== undefined) $(s).val(curr_selected);
-        });
+            if(curr_selected !== undefined) $(s).val(curr_selected)
+        })
     })
 }
 
@@ -665,7 +665,7 @@ function updateTokenOrders() {
                                 data-txid="${order.txid}"
                         class="button-token-fill-order btn btn-primary">${buy ? 'Sell' : 'Buy'}</button></td>
                 </tr>
-            `);
+            `)
 
 
             // If it's my order, add them to the my orders tables
@@ -681,7 +681,7 @@ function updateTokenOrders() {
                             data-txid="${order.txid}"
                             class="button-token-remove-order btn btn-primary">Remove</button></td>
                     </tr>
-                `);            
+                `)            
             }
         }
     })
@@ -690,7 +690,7 @@ function updateTokenOrders() {
 
 // Remove order
 $(document).on('click', '.button-token-remove-order', function() {
-    let btn = $(this);
+    let btn = $(this)
 
     let type = btn.attr("data-type")
     let tokenid = btn.attr("data-tokenid")
@@ -712,7 +712,7 @@ $(document).on('click', '.button-token-remove-order', function() {
 
 // Fill order
 $(document).on('click', '.button-token-fill-order', function() {
-    let btn = $(this);
+    let btn = $(this)
 
     let action = btn.attr("data-action")
     let name = btn.attr("data-name")
@@ -763,17 +763,17 @@ function openPage(page) {
     // Hide other pages
     for(let p of pages) {
         if(p !== page) {
-            $('#' + p + '-page-only').hide();
-            $('#nav-' + p).toggleClass("active", false);
+            $('#' + p + '-page-only').hide()
+            $('#nav-' + p).toggleClass("active", false)
         }
     }
 
     // Show this one
-    $('#nav-' + page).toggleClass("active", true);
-    $('#' + page + '-page-only').show();
+    $('#nav-' + page).toggleClass("active", true)
+    $('#' + page + '-page-only').show()
 }
 
 $("#menu-toggle").click(function(e) {
-    e.preventDefault();
-    $("#wrapper").toggleClass("toggled");
-});
+    e.preventDefault()
+    $("#wrapper").toggleClass("toggled")
+})

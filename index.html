@@ -302,25 +302,27 @@
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
-                <div class="modal-body">
 
-                    <div class="form-group">
-                      <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text">Public key</span>
+                <form id="form-save-pubkey">
+                  <div class="modal-body">
+                      <div class="form-group">
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text">Public key</span>
+                          </div>
+                          <input type="text" class="form-control" id="input-pubkey" placeholder="A new key will be generated...">
+                          <small class="form-text text-muted">
+                              You can also leave this input box <strong>empty</strong> and save to <strong>generate a new key</strong>.
+                          </small>
                         </div>
-                        <input type="text" class="form-control" id="input-pubkey" placeholder="A new key will be generated...">
-                        <small class="form-text text-muted">
-                            You can also leave this input box <strong>empty</strong> and save to <strong>generate a new key</strong>.
-                        </small>
                       </div>
-                    </div>
+                  </div>
 
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                  <button id="button-save-pubkey" type="button" class="btn btn-info">Save</button>
-                </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button id="button-save-pubkey" type="submit" class="btn btn-info">Save</button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
