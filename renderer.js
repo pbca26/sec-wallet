@@ -560,7 +560,7 @@ $('#form-create-token-submit').submit(event => {
 
 
 // Create buy / sell orders
-let actions = ['buy', 'sell']
+const actions = ['buy', 'sell']
 actions.forEach(action => {
     $('#form-token-' + action + '-order-submit').submit(event => {
         // Close the modal
@@ -570,6 +570,12 @@ actions.forEach(action => {
         let tokenid = $('#select-token-' + action + '-order').val()
         let price = $('#input-token-' + action + '-order-price').val()
         let supply = $('#input-token-' + action + '-order-supply').val()
+
+        // Validate inputs
+        if(parseFloat(price) === 0) {
+            statusAlert(false, 'Failed to create order: Price can\'t be zero.')
+            return false
+        }
         
         // Create token
         daemon.createTokenTradeOrder(action, supply, tokenid, price).then(() => {
