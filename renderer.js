@@ -55,20 +55,27 @@ mainWindow.on('close', e => {
             console.log('Window close request, opening encryption screen')
 
             exitInitialized = true
-            inputLock(true, 'Stopping the daemon, then you\'ll enter a password to encrypt the wallet...');
 
-            stopUpdateIntervals()
-            daemon.stopDaemon().then(() => {
+            stopAll('Stopping the daemon, then you\'ll enter a password to encrypt the wallet...').then(() => {
                 inputLock(false)
                 promptPasswordScreen('encrypt')
             })
         }
     }
     // Shouldn't reach here but just in case, stop the daemon
-    else daemon.stopDaemon()
+    else stopAll('Stopping the daemon...')
 })
 
 
+function stopAll(loading_text) {
+    inputLock(true, loading_text);
+    return new Promise((resolve, reject) => {
+        stopUpdateIntervals()
+        daemon.stopDaemon().then(() => {
+            resolve()
+        })
+    })
+}
 
 
 
@@ -479,8 +486,7 @@ $('#button-save-pubkey').click(event => {
     
     if(new_pubkey !== daemon.getKeyPair().pubkey) {
         // Restart the daemon
-        inputLock(true, 'Restarting the daemon...');
-        daemon.stopDaemon().then(() => {
+        stopAll('Restarting the daemon...').then(() => {
             init(new_pubkey).then(() => {
                 console.log('Restarted the daemon.')
             })

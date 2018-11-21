@@ -64,7 +64,7 @@ function readConfig() {
 
 function startUp(pubkey) {
     return new Promise((resolve, reject) => {
-        // If pubkey does not exist: First launch
+        // If pubkey does not exist: First launch, or generating a new one
         if(pubkey === '') {
             keypair = keygen.generateKeyPair()
             pubkey = keypair.pubkey
@@ -74,10 +74,12 @@ function startUp(pubkey) {
             console.log('pubkey: ' + keypair.pubkey)
             
             launchDaemon(pubkey).then(() => {
-                importPrivKey(keypair.privkey).then(addr_info => {
-                    keypair.address = addr_info.address
-                    keypair.CCaddress = addr_info.CCaddress
-                    resolve({ generated: true, privkey: keypair.privkey, pubkey, address: addr_info.address })
+                importPrivKey(keypair.privkey).then(() => {
+                    getAddressFromPubkey(pubkey).then(addr_info => {
+                        keypair.address = addr_info.address
+                        keypair.CCaddress = addr_info.CCaddress
+                        resolve({ generated: true, privkey: keypair.privkey, pubkey, address: addr_info.address })
+                    })
                 })
             })
         }
