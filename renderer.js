@@ -264,9 +264,7 @@ function promptPasswordScreen(type) {
     $('#modal-enter-password').modal({ backdrop: 'static', keyboard: false })
 }
 
-$('#button-submit-password').click(event => {
-    event.preventDefault()
-
+$('#form-submit-password').submit(event => {
     // TODO: Validate inputs 
     let password = $('#input-password').val()
     let action = $('#button-submit-password').attr('data-action')
@@ -300,6 +298,8 @@ $('#button-submit-password').click(event => {
             mainWindow.close()
         })
     }
+
+    return false
 })
 
 
@@ -545,8 +545,9 @@ $('#form-create-token-submit').submit(event => {
 
 
 // Create buy / sell orders
-['buy', 'sell'].forEach(action => {
-    $('#form-token-'+ action +'-order-submit').submit(event => {
+let actions = ['buy', 'sell']
+actions.forEach(action => {
+    $('#form-token-' + action + '-order-submit').submit(event => {
         // Close the modal
         $('#modal-token-' + action +'-order').modal('hide')
     
