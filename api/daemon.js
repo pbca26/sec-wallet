@@ -15,11 +15,11 @@ const default_config = {
 }
 
 // Data
-let config = {}
-let komodod_path = ''
-let cli_path = ''
+let komodod_path = undefined
+let cli_path = undefined
 let keypair = undefined 
-let komodod = undefined // This will be the komodod object
+let komodod = undefined // This will be the spawned cli komodod object
+let config = undefined
 
 function readConfig() {
     // Set default
