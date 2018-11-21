@@ -658,7 +658,7 @@ function updateTokenOrders() {
         // Remove all
         $('#table-token-buy').children().remove()
         $('#table-token-sell').children().remove()
-        $('#table-token-my-sell').children().remove()
+        $('#table-token-my-buy').children().remove()
         $('#table-token-my-sell').children().remove()
         
         let my_address = daemon.getKeyPair().CCaddress
