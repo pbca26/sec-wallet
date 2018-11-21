@@ -432,13 +432,13 @@ function addTransactionToHistory(address, amount, asset_name, extra='') {
 }
 
 function addToHistory(text) {
-    let thistory = $('#textarea-history')
-    let curr_text = thistory.val()
-    
+    // Add timestamp
     var time = new Date().toTimeString().substr(0, 8)
-
     text = time + ' - ' + text
-
+    
+    let thistory = $('#textarea-history')
+    
+    let curr_text = thistory.val()
     thistory.val(curr_text + (curr_text === '' ? '' : '\n') + text)
 
     // Scroll to bottom
