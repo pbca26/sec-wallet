@@ -5703,7 +5703,6 @@ input[type="button"].btn-block {
   font-size: 1.5rem;
   font-weight: 700;
   line-height: 1;
-  color: #839496;
   text-shadow: none;
   opacity: .5;
 }
@@ -5713,7 +5712,6 @@ input[type="button"].btn-block {
 }
 
 .close:not(:disabled):not(.disabled):hover, .close:not(:disabled):not(.disabled):focus {
-  color: #839496;
   text-decoration: none;
   opacity: .75;
 }
