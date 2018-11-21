@@ -136,9 +136,10 @@ function firstLaunch() {
     init(store.get('pubkey')).then(() => {
         // Disable window close, require 
         setPreventWindowClose(true)
+        
+        startUpdateIntervals()
     })
 
-    startUpdateIntervals()
 }
 
 

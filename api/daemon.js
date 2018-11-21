@@ -11,7 +11,7 @@ const default_config = {
     bin_folder: os.homedir() + '/Documents/komodo/src/',
     chain_name: 'NAE',
     coin_name: 'NAE',
-    chain_launch_params: '-ac_supply=100000 -addnode=95.216.196.64 -ac_cc=1337'
+    chain_launch_params: '-ac_supply=100000 -addnode=95.216.196.64 -ac_cc=1337 -printtoconsole'
 }
 
 // Data
@@ -110,17 +110,18 @@ function launchDaemon(pubkey) {
         console.log('Launching the daemon... \n' + command)
         komodod = child_process.spawn(program, args)
 
-
         komodod.stdout.on('data', data => {
             console.log('komodod stdout: ' + data)
+
+            // Wait until komodod is ready
+            if(data.indexOf('init message: Done loading') !== -1) {
+                resolve()
+            }
         })
 
-        komodod.stderr.on('data', data => {
-            console.log('komodod stderr: ' + data)
-        })
-
-        // Wait until daemon is ready
-        setTimeout(() => { resolve() }, 3000)
+        // komodod.stderr.on('data', data => {
+        //     console.log('komodod stderr: ' + data)
+        // })
     })
 }
 
@@ -153,7 +154,6 @@ function getBalance() {
             }
 
             if(stdout) {
-                console.log('getBalance: ', stdout)
                 resolve(JSON.parse(stdout).balance)
             }
 
