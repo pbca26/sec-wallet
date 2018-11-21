@@ -733,8 +733,7 @@ $(document).on('click', '.button-token-fill-order', function() {
 
 
 // Fill order final submit
-$('#button-token-fill-order-submit').click(event => {
-    event.preventDefault();
+$('#form-token-fill-order-submit').submit(event => {
     // Close the modal
     $('#modal-token-fill-order').modal('hide')
 
@@ -756,6 +755,8 @@ $('#button-token-fill-order-submit').click(event => {
     }).catch(e => {
         statusAlert(false, e)
     })
+
+    return false
 })
 
 function openPage(page) {
