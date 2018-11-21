@@ -14,7 +14,7 @@ let keypair = undefined
 function readConfig() {
     // Set default
     config = {
-        bin_folder: '~/Documents/komodo/src/',
+        bin_folder: os.homedir() + '/Documents/komodo/src/',
         chain_name: 'NAE',
         coin_name: 'NAE',
         chain_launch_params: '-ac_supply=100000 -addnode=95.216.196.64 -ac_cc=1337'
@@ -92,17 +92,24 @@ function startUp(pubkey) {
 function launchDaemon(pubkey) {
     return new Promise((resolve, reject) => {
         let command = komodod_path + config.chain_launch_params + ' -pubkey=' + pubkey
-        
+
+        let args = command.split(' ')
+        let program = args.shift()
+
         console.log('Launching the daemon... \n' + command)
-        let cli = child_process.exec(command)
+        let cli = child_process.spawn(program, args)
+
 
         cli.stdout.on('data', data => {
             console.log('stdout: ' + data)
         });
 
-
         cli.stderr.on('data', data => {
             console.log('stderr: ' + data)
+        });
+
+        cli.on('close', function (code) {
+            console.log('child process exited with code ' + code);
         });
 
         // Wait until daemon is ready
