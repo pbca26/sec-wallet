@@ -428,6 +428,10 @@ function statusAlert(success, text) {
     console.log(text)
 
     $("#status-alert").show()
+
+    // Scroll to top to show status alert
+    document.body.scrollTop = 0; // For Safari
+    document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
 }
 
 function addTransactionToHistory(address, amount, asset_name, extra='') {
