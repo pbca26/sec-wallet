@@ -782,19 +782,18 @@ $('#form-token-fill-order-submit').submit(event => {
 
     let name = btn.attr("data-name")
     let price = btn.attr("data-price")
-    let amount = btn.attr("data-amount") // Supply
+    let amount = parseInt(btn.attr("data-amount")) // Supply
     let action = btn.attr("data-action")
     let tokenid = btn.attr("data-tokenid")
     let txid = btn.attr("data-txid")
 
-    let count = $('#input-token-fill-order-fill-count').val()
+    let count = parseInt($('#input-token-fill-order-fill-count').val())
 
     // Validate inputs 
     if(amount < count) {
         if(action === 'buy')
             statusAlert(false, 'Failed to buy tokens: Supply is less than what you want to buy.')
-        
-        if(action === 'sell') 
+        else if(action === 'sell') 
             statusAlert(false, 'Failed to sell tokens: Asked amount is less than what you want to sell.')
 
         return false
