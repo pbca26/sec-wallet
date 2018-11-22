@@ -354,10 +354,18 @@ $('.alert .close').on('click', function(e) {
 
 $('#form-send').submit(event => {    
     let address = $('#input-address').val()
-    let amount = $('#input-amount').val()
+    let amount = parseFloat($('#input-amount').val())
+    
     // Validate inputs 
     if(parseFloat(amount) === 0) {
         statusAlert(false, 'Failed to send: Amount can\'t be zero.')
+        return false
+    }
+
+    let balance = parseFloat($('#balance').val())
+    if(amount > balance) {
+        statusAlert(false, 'Failed to send: Insufficient funds.')
+
         return false
     }
 
