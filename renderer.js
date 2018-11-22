@@ -757,7 +757,7 @@ $(document).on('click', '.button-token-fill-order', function() {
     let tokenid = btn.attr("data-tokenid")
     let txid = btn.attr("data-txid")
     
-    $('#text-token-fill-order-action').html((action === 'buy' ? 'Sell' : 'Buy') + 'ing Token')
+    $('#text-token-fill-order-action').html((action === 'buy' ? 'Buy' : 'Sell') + 'ing Token')
     $('#text-token-fill-order-name').val(name)
     $('#input-token-fill-order-price').val(stripZeros(price) + ' ' + daemon.getCoinName())
     $('#input-token-fill-order-amount').val(amount)
