@@ -571,21 +571,21 @@ actions.forEach(action => {
     
         let selected = $('option:selected', $('#select-token-' + action + '-order')) 
 
-        let balance = selected.attr('data-balance')
+        let token_balance = parseInt(selected.attr('data-balance'))
         let tokenid = $('#select-token-' + action + '-order').val()
-        let price = $('#input-token-' + action + '-order-price').val()
+        let price = parseInt($('#input-token-' + action + '-order-price').val())
         let supply = $('#input-token-' + action + '-order-supply').val()
         
         let name = selected.attr('data-name')
 
         // Validate inputs
         if(parseFloat(price) === 0) {
-            statusAlert(false, 'Failed to create order: Price can\'t be zero.')
+            statusAlert(false, 'Failed to create ' + action + ' order: Price can\'t be zero.')
             return false
         }
         
-        if(action === 'sell' && parseInt(supply) > parseInt(balance)) {
-            statusAlert(false, 'Failed to create order: Not enough tokens.')
+        if(action === 'sell' && supply > token_balance) {
+            statusAlert(false, 'Failed to create sell order: Not enough tokens.')
             return false
         }
         
