@@ -706,7 +706,7 @@ function updateTokenOrders() {
 
             // If it's my order, add them to the my orders tables
             if(my_address === order.origaddress) {
-                $('#table-token-my-' + order.action).append(`
+                $('#table-token-my-' + (buy ? 'buy' : sell ? 'sell' : 'unknown-func')).append(`
                     <tr>
                         <td>${order.name}</td>
                         <td>${order.price}</td>
