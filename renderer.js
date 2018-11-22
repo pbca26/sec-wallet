@@ -589,7 +589,7 @@ actions.forEach(action => {
         // Create token
         daemon.createTokenTradeOrder(action, supply, tokenid, price).then(() => {            
             statusAlert(true, addToHistory('Created token order, ' + action + 'ing ' + supply + ' ' + name +
-                                ' for ' + price + ' ' + daemon.getCoinName() + ' each. Transaction ID: ' + tokenid))
+                                ' for ' + stripZeros(price) + ' ' + daemon.getCoinName() + ' each. Transaction ID: ' + tokenid))
         }).catch(e => {
             statusAlert(false, 'Could not create token trade order: ' + e)
         })
@@ -690,7 +690,7 @@ function updateTokenOrders() {
             $('#table-token-' + order.action).append(`
                 <tr>
                     <td>${order.name}</td>
-                    <td>${order.price + ' ' + daemon.getCoinName()}</td>
+                    <td>${stripZeros(order.price) + ' ' + daemon.getCoinName()}</td>
                     <td>${order.real_amount}</td>
                     <td><button data-toggle="modal" data-target="#modal-token-fill-order" 
                                 data-action="${order.action}" 
@@ -709,7 +709,7 @@ function updateTokenOrders() {
                 $('#table-token-my-' + (buy ? 'buy' : sell ? 'sell' : 'unknown-func')).append(`
                     <tr>
                         <td>${order.name}</td>
-                        <td>${order.price + ' ' + daemon.getCoinName()}</td>
+                        <td>${stripZeros(order.price) + ' ' + daemon.getCoinName()}</td>
                         <td>${order.real_amount}</td>
                         <td><button 
                             data-type="${buy ? 'bid' : 'ask'}" 
@@ -759,8 +759,10 @@ $(document).on('click', '.button-token-fill-order', function() {
     
     $('#text-token-fill-order-action').html((action === 'buy' ? 'Sell' : 'Buy') + 'ing Token')
     $('#text-token-fill-order-name').val(name)
-    $('#input-token-fill-order-price').val(price)
+    $('#input-token-fill-order-price').val(stripZeros(price) + ' ' + daemon.getCoinName())
     $('#input-token-fill-order-amount').val(amount)
+
+
 
     $('#button-token-fill-order-submit').attr('data-action', action)
     $('#button-token-fill-order-submit').attr('data-tokenid', tokenid)
@@ -801,7 +803,7 @@ $('#form-token-fill-order-submit').submit(event => {
     daemon.fillTokenOrder(action, tokenid, txid, count).then(fill_order_id => {
         // Update status text
         statusAlert(true, addToHistory('Filling token order, ' + action + 'ing ' + 
-                                count + ' ' + name + ' for ' + price + ' ' + daemon.getCoinName() + ' each.' +
+                                count + ' ' + name + ' for ' + stripZeros(price) + ' ' + daemon.getCoinName() + ' each.' +
                                         '\nTokenID: ' + tokenid + 
                                         '\nOrder ID: ' + txid + 
                                         '\nFill Order ID: ' + fill_order_id))
@@ -830,3 +832,8 @@ $("#menu-toggle").click(function(e) {
     e.preventDefault()
     $("#wrapper").toggleClass("toggled")
 })
+
+
+function stripZeros(float) {
+    return (float * 1).toString()
+}
