@@ -785,7 +785,7 @@ $('#form-token-fill-order-submit').submit(event => {
     let btn = $('#button-token-fill-order-submit')
 
     let name = btn.attr("data-name")
-    let price = btn.attr("data-price")
+    let price = parseFloat(btn.attr("data-price"))
     let amount = parseInt(btn.attr("data-amount")) // Supply
     let action = btn.attr("data-action")
     let tokenid = btn.attr("data-tokenid")
@@ -801,6 +801,15 @@ $('#form-token-fill-order-submit').submit(event => {
             statusAlert(false, 'Failed to sell tokens: Asked amount is less than what you want to sell.')
 
         return false
+    }
+
+    if(action === 'buy') {
+        let balance = parseFloat($('#balance').val())
+        if(price * count > balance) {
+            statusAlert(false, 'Failed to buy tokens: Insufficient funds.')
+
+            return false
+        }
     }
 
     daemon.fillTokenOrder(action, tokenid, txid, count).then(fill_order_id => {
