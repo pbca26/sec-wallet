@@ -732,9 +732,12 @@ function updateTokenOrders() {
                         <td>${order.real_amount}</td>
                         <td><button 
                             data-type="${buy ? 'bid' : 'ask'}" 
+                            data-name="${order.name}" 
+                            data-price="${order.price}"
+                            data-amount="${order.real_amount}" 
                             data-tokenid="${order.tokenid}" 
                             data-txid="${order.txid}"
-                            class="button-token-remove-order btn btn-primary">Remove</button></td>
+                            class="button-token-cancel-order btn btn-primary">Cancel</button></td>
                     </tr>
                 `)            
             }
@@ -744,19 +747,21 @@ function updateTokenOrders() {
 
 
 // Remove order
-$(document).on('click', '.button-token-remove-order', function() {
     let btn = $(this)
 
-    let type = btn.attr("data-type")
+    let name = btn.attr("data-name")
+    let price = parseFloat(btn.attr("data-price"))
+    let amount = parseInt(btn.attr("data-amount")) // Supply
+    let type = btn.attr("data-type") 
     let tokenid = btn.attr("data-tokenid")
     let txid = btn.attr("data-txid")
 
-    daemon.cancelTokenOrder(type, tokenid, txid).then(() => {
-        // Add it to transaction history
-        let transaction_text = 'Cancelling token order...'//addTransactionToHistory(address, amount, daemon.getCoinName())
-
-        // Update status text
-        statusAlert(true, transaction_text)
+    daemon.cancelTokenOrder(type, tokenid, txid).then(cancel_order_id => {
+        statusAlert(true, addToHistory('Cancelling token order: "' + (type === 'ask' ? 'Sell' : 'Buy') + ' ' + 
+                    amount + ' ' + name + ' for ' + stripZeros(price) + ' ' + daemon.getCoinName() + ' each."' +
+                                        '\nTokenID: ' + tokenid + 
+                                        '\nOrder ID: ' + txid + 
+                                        '\nCancel Order ID: ' + cancel_order_id))
     }).catch(e => {
         statusAlert(false, e)
     })

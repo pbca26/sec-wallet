@@ -464,11 +464,11 @@ function fillTokenOrder(func, tokenid, txid, count) {
     })
 }
 
-function cancelTokenOrder(func, tokenid, txid) {
+function cancelTokenOrder(action, tokenid, txid) {
     return new Promise((resolve, reject) => {
-        console.log('Cancelling order token order:' + func + ', tokenid: ' + tokenid + ', txid: ' + txid)
+        console.log('Cancelling order token order:' + action + ', tokenid: ' + tokenid + ', txid: ' + txid)
         
-        const cli = child_process.execFile(cli_path, to_cli_args('tokencancel' + func + ' ' + tokenid + ' ' + txid), (error, stdout, stderr) => {
+        const cli = child_process.execFile(cli_path, to_cli_args('tokencancel' + action + ' ' + tokenid + ' ' + txid), (error, stdout, stderr) => {
 
             if(stderr) {
                 console.log('cancelTokenOrder failed: ', stderr)
@@ -476,7 +476,7 @@ function cancelTokenOrder(func, tokenid, txid) {
             }
 
             if(stdout) {
-                console.log('Broadcasting cancel order... ' + func)
+                console.log('Broadcasting cancel order... ' + action)
                 broadcastTX(JSON.parse(stdout).hex).then(txid => {
                     resolve(txid)
                 }).catch(e => {
