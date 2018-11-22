@@ -760,6 +760,8 @@ $(document).on('click', '.button-token-fill-order', function() {
     $('#button-token-fill-order-submit').attr('data-action', action)
     $('#button-token-fill-order-submit').attr('data-tokenid', tokenid)
     $('#button-token-fill-order-submit').attr('data-txid', txid)
+    $('#button-token-fill-order-submit').attr('data-name', name)
+    $('#button-token-fill-order-submit').attr('data-amount', amount)
 })
 
 
@@ -770,19 +772,32 @@ $('#form-token-fill-order-submit').submit(event => {
 
     let btn = $('#button-token-fill-order-submit')
 
-    // TODO: Validate inputs 
+    let name = btn.attr("data-name")
+    let amount = btn.attr("data-amount") // Supply
     let action = btn.attr("data-action")
     let tokenid = btn.attr("data-tokenid")
     let txid = btn.attr("data-txid")
+
     let count = $('#input-token-fill-order-fill-count').val()
 
+    if(amount < count) {
+        if(action === 'buy')
+            statusAlert(false, 'Failed to buy tokens: Supply is less than what you want to buy.')
+        
+        if(action === 'sell') 
+            statusAlert(false, 'Failed to sell tokens: Asked amount is less than what you want to sell.')
 
     daemon.fillTokenOrder(action, tokenid, txid, count).then(() => {
-        // Add it to transaction history
-        let transaction_text = 'Filling token order...'//addTransactionToHistory(address, amount, daemon.getCoinName())
+        return false
+    }
 
         // Update status text
         statusAlert(true, transaction_text)
+        statusAlert(true, addToHistory('Filling token order, ' + action + 'ing ' + 
+                                count + ' ' + name + ' for ' + amount + daemon.getCoinName() + ' each.' +
+                                        '\nTokenID: ' + tokenid + 
+                                        '\nOrder ID: ' + txid + 
+                                        '\nFill Order ID: ' + fill_order_id))
     }).catch(e => {
         statusAlert(false, e)
     })
