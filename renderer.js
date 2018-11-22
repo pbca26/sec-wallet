@@ -747,6 +747,7 @@ function updateTokenOrders() {
 
 
 // Remove order
+$(document).on('click', '.button-token-cancel-order', function() {
     let btn = $(this)
 
     let name = btn.attr("data-name")
