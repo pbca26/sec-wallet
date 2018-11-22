@@ -382,7 +382,7 @@ $('#form-token-send').submit(event => {
     let token_line = $('#select-tokens option:selected').text()
     let token_id = $('#select-tokens').val()
     let address = $('#input-token-address').val()
-    let amount = $('#input-token-amount').val()
+    let amount = parseInt($('#input-token-amount').val())
 
     let line_arr = token_line.split(' ')
     let token_name = line_arr[0] 
@@ -534,7 +534,7 @@ $('#form-create-token-submit').submit(event => {
     $('#modal-create-token').modal('hide')
 
     let name = $('#input-create-token-name').val()
-    let supply = $('#input-create-token-supply').val()
+    let supply = parseInt($('#input-create-token-supply').val())
     let description = $('#input-create-token-description').val()
 
     // Validate inputs 
@@ -571,10 +571,10 @@ actions.forEach(action => {
     
         let selected = $('option:selected', $('#select-token-' + action + '-order')) 
 
-        let token_balance = parseInt(selected.attr('data-balance'))
         let tokenid = $('#select-token-' + action + '-order').val()
+        let token_balance = parseInt(selected.attr('data-balance'))
         let price = parseInt($('#input-token-' + action + '-order-price').val())
-        let supply = $('#input-token-' + action + '-order-supply').val()
+        let supply = parseInt($('#input-token-' + action + '-order-supply').val())
         
         let name = selected.attr('data-name')
 
@@ -800,7 +800,7 @@ $('#form-token-fill-order-submit').submit(event => {
     let tokenid = btn.attr("data-tokenid")
     let txid = btn.attr("data-txid")
 
-    let count = parseInt($('#input-token-fill-order-fill-count').val())
+    let count = parseInt($('#input-token-fill-order-fill-count').val()) // User count input
 
     // Validate inputs 
     if(amount < count) {
