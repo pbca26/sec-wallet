@@ -269,8 +269,6 @@ $('#form-submit-password').submit(event => {
     let password = $('#input-password').val()
     let action = $('#button-submit-password').attr('data-action')
 
-    console.log('action:' + action + '  password: ' + password)
-
     // Hide the error
     $("#status-alert-password").hide()
     
