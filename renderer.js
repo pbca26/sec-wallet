@@ -579,7 +579,7 @@ actions.forEach(action => {
 
         let tokenid = $('#select-token-' + action + '-order').val()
         let token_balance = parseInt(selected.attr('data-balance'))
-        let price = parseInt($('#input-token-' + action + '-order-price').val())
+        let price = parseFloat($('#input-token-' + action + '-order-price').val())
         let supply = parseInt($('#input-token-' + action + '-order-supply').val())
         
         let name = selected.attr('data-name')
