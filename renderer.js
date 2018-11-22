@@ -588,6 +588,15 @@ actions.forEach(action => {
             statusAlert(false, 'Failed to create sell order: Not enough tokens.')
             return false
         }
+
+        if(action === 'buy') {
+            let balance = parseFloat($('#balance').val())
+            if(price * supply > balance) {
+                statusAlert(false, 'Failed to create buy order: Insufficient funds.')
+
+                return false
+            }
+        }
         
         
         // Create token
