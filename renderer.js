@@ -690,7 +690,7 @@ function updateTokenOrders() {
             $('#table-token-' + order.action).append(`
                 <tr>
                     <td>${order.name}</td>
-                    <td>${order.price}</td>
+                    <td>${order.price + ' ' + daemon.getCoinName()}</td>
                     <td>${order.real_amount}</td>
                     <td><button data-toggle="modal" data-target="#modal-token-fill-order" 
                                 data-action="${order.action}" 
@@ -709,7 +709,7 @@ function updateTokenOrders() {
                 $('#table-token-my-' + (buy ? 'buy' : sell ? 'sell' : 'unknown-func')).append(`
                     <tr>
                         <td>${order.name}</td>
-                        <td>${order.price}</td>
+                        <td>${order.price + ' ' + daemon.getCoinName()}</td>
                         <td>${order.real_amount}</td>
                         <td><button 
                             data-type="${buy ? 'bid' : 'ask'}" 
