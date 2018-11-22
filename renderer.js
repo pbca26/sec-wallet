@@ -565,10 +565,14 @@ actions.forEach(action => {
         // Close the modal
         $('#modal-token-' + action +'-order').modal('hide')
     
-        let balance = $('option:selected', $('#select-token-' + action + '-order')).attr('data-balance')
+        let selected = $('option:selected', $('#select-token-' + action + '-order')) 
+
+        let balance = selected.attr('data-balance')
         let tokenid = $('#select-token-' + action + '-order').val()
         let price = $('#input-token-' + action + '-order-price').val()
         let supply = $('#input-token-' + action + '-order-supply').val()
+        
+        let name = selected.attr('data-name')
 
         // Validate inputs
         if(parseFloat(price) === 0) {
@@ -584,8 +588,8 @@ actions.forEach(action => {
         
         // Create token
         daemon.createTokenTradeOrder(action, supply, tokenid, price).then(() => {            
-            statusAlert(true, addToHistory('Created token ' + action + ' order. Supply: ' + supply +
-                                ', Price: ' + price + ', Transaction ID: ' + tokenid))
+            statusAlert(true, addToHistory('Created token order, ' + action + 'ing ' + supply + ' ' + name +
+                                ' for ' + price + ' ' + daemon.getCoinName() + ' each. Transaction ID: ' + tokenid))
         }).catch(e => {
             statusAlert(false, 'Could not create token trade order: ' + e)
         })
@@ -646,7 +650,8 @@ function updateTokenLists() {
 
             // Add new ones
             for(var i = 0; i < list.length; ++i) {
-                $(s).append('<option value="' + list[i].id + '" data-balance="' + list[i].balance + '">' + 
+                $(s).append('<option value="' + list[i].id + '" data-balance="' + list[i].balance + '"' +
+                ' data-name="' + list[i].name + '">' + 
                                 list[i].name + ' - ' + list[i].balance + '</option>')
             }
 
@@ -762,6 +767,7 @@ $(document).on('click', '.button-token-fill-order', function() {
     $('#button-token-fill-order-submit').attr('data-txid', txid)
     $('#button-token-fill-order-submit').attr('data-name', name)
     $('#button-token-fill-order-submit').attr('data-amount', amount)
+    $('#button-token-fill-order-submit').attr('data-price', price)
 })
 
 
@@ -773,6 +779,7 @@ $('#form-token-fill-order-submit').submit(event => {
     let btn = $('#button-token-fill-order-submit')
 
     let name = btn.attr("data-name")
+    let price = btn.attr("data-price")
     let amount = btn.attr("data-amount") // Supply
     let action = btn.attr("data-action")
     let tokenid = btn.attr("data-tokenid")
@@ -780,6 +787,7 @@ $('#form-token-fill-order-submit').submit(event => {
 
     let count = $('#input-token-fill-order-fill-count').val()
 
+    // Validate inputs 
     if(amount < count) {
         if(action === 'buy')
             statusAlert(false, 'Failed to buy tokens: Supply is less than what you want to buy.')
@@ -787,14 +795,13 @@ $('#form-token-fill-order-submit').submit(event => {
         if(action === 'sell') 
             statusAlert(false, 'Failed to sell tokens: Asked amount is less than what you want to sell.')
 
-    daemon.fillTokenOrder(action, tokenid, txid, count).then(() => {
         return false
     }
 
+    daemon.fillTokenOrder(action, tokenid, txid, count).then(fill_order_id => {
         // Update status text
-        statusAlert(true, transaction_text)
         statusAlert(true, addToHistory('Filling token order, ' + action + 'ing ' + 
-                                count + ' ' + name + ' for ' + amount + daemon.getCoinName() + ' each.' +
+                                count + ' ' + name + ' for ' + price + ' ' + daemon.getCoinName() + ' each.' +
                                         '\nTokenID: ' + tokenid + 
                                         '\nOrder ID: ' + txid + 
                                         '\nFill Order ID: ' + fill_order_id))
