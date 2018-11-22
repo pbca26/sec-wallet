@@ -765,7 +765,7 @@ $(document).on('click', '.button-token-cancel-order', function() {
                                         '\nCancel Order ID: ' + cancel_order_id))
     }).catch(e => {
         // Unknown error, no message
-        if(e.indexOf('error code: -25') !== -1) 
+        if(e.indexOf('error code: -25') !== -1 || e.indexOf('error code: -26') !== -1) 
             e = 'Failed to cancel token order: Unknown reason. If you tried cancelling it before, please wait, it might take a while.'
 
         statusAlert(false, e)
