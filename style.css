@@ -2,6 +2,11 @@ span {
   white-space: pre-line
 }
 
+.input-group small {
+  display: initial;
+  position: initial;
+}
+
 /** SPINNER CREATION **/
 
 .loader {

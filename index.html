@@ -63,14 +63,9 @@
                 <div class="input-group-append">
                   <button id="button-token-create" type="button" class="btn btn-secondary my-2 my-sm-0" data-toggle="modal" data-target="#modal-create-token">Create</button>  
                 </div>
-
-                <small class="form-text text-muted">
-                  After sending token, amount will appear as '0' until the transaction is <strong>validated.</strong> Please wait until it's <strong>refreshed</strong>.
-                </small>
               </div>
 
             <hr>
-
             <form id="form-token-send">
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
@@ -86,7 +81,12 @@
                 <input id="input-token-amount" type="number" min="1" step="1" class="form-control" placeholder="Enter the amount you'll send" required>
               </div>
                 
-              <button id="button-token-send" type="submit" class="btn btn-info">Send</button>
+              <div style="display: flex;">
+                <button id="button-token-send" type="submit" class="btn btn-info">Send</button>
+                <span class="align-middle" style="white-space: unset; margin-left: 1em"><small class="text-muted">
+                  After sending token, balance might appear as '0' until the transaction is <strong>validated.</strong> Please wait until it's <strong>refreshed</strong>.
+                </small></span>
+              </div>
             </form>
           </div>
 
