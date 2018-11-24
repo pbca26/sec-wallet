@@ -22,6 +22,27 @@ table button {
   width: 5em;
 }
 
+thead {
+  background: rgba(255, 255, 255, 0.125);
+}
+
+tbody {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+
+tbody tr:nth-child(even) {
+	background: rgba(255, 255, 255, .025)
+}
+
+tbody tr:hover {
+	background: rgba(255, 255, 255, .05)
+}
+
+tbody td:hover {
+	background: rgba(255, 255, 255, .025)
+}
+
 
 /** SPINNER CREATION **/
 
@@ -139,23 +160,6 @@ body {
   line-height: 40px;
 }
 
-
-
-
-thead {
-  background: rgba(255, 255, 255, 0.125);
-}
-
-tbody {
-  background: rgba(255, 255, 255, 0.035);
-}
-
-tbody tr:hover {
-  background: rgba(255, 255, 255, 0.025);
-}
-
-
-
 .sidebar-nav li a {
   display: block;
   text-decoration: none;
@@ -192,7 +196,6 @@ tbody tr:hover {
   color: #fff;
   background: none;
 }
-
 
 #wrapper {
   padding-left: 0;
