@@ -28,7 +28,7 @@ function createWindow () {
   mainWindow.loadFile('index.html')
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools()
+  //mainWindow.webContents.openDevTools()
 
   // Prevent window from closing
   mainWindow.on('close', e => { if(preventWindowClose || loading) e.preventDefault() })

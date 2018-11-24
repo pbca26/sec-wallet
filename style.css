@@ -17,6 +17,12 @@ h5 {
   float: right;
 }
 
+#menu-toggle {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 table {
   text-align: center;
   vertical-align: middle;
