@@ -10,6 +10,7 @@ span {
 
 h5 {
   display: inline-block;
+  margin-top: 0.35em;
 }
 
 #button-token-sell-order, #button-token-buy-order {
@@ -138,9 +139,22 @@ body {
   line-height: 40px;
 }
 
-tbody tr:hover {
-  background: rgba(255, 255, 255, 0.05);
+
+
+
+thead {
+  background: rgba(255, 255, 255, 0.125);
 }
+
+tbody {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+tbody tr:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+
 
 .sidebar-nav li a {
   display: block;
