@@ -17,10 +17,23 @@ h5 {
   float: right;
 }
 
+table {
+  text-align: center;
+  vertical-align: middle;
+}
+
 table button {
-  float: right;
   width: 5em;
 }
+
+thead th:last-child {
+  width: 5em
+}
+
+/* Lines between columns */
+table { border: none; border-collapse: collapse;  }
+table td { border-left: 1px solid rgba(255, 255, 255, 0.125); }
+table td:first-child, table td:last-child { border-left: none; }
 
 thead {
   background: rgba(255, 255, 255, 0.125);
@@ -29,7 +42,6 @@ thead {
 tbody {
   background: rgba(255, 255, 255, 0.035);
 }
-
 
 tbody tr:nth-child(even) {
 	background: rgba(255, 255, 255, .025)
