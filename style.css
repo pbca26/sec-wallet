@@ -12,6 +12,16 @@ h5 {
   display: inline-block;
 }
 
+#button-token-sell-order, #button-token-buy-order {
+  float: right;
+}
+
+table button {
+  float: right;
+  width: 5em;
+}
+
+
 /** SPINNER CREATION **/
 
 .loader {
