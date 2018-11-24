@@ -718,7 +718,7 @@ function updateTokenOrders() {
                                 data-amount="${order.real_amount}"
                                 data-tokenid="${order.tokenid}"
                                 data-txid="${order.txid}"
-                        class="button-token-fill-order btn btn-primary btn-sm">${buy ? 'Sell' : 'Buy'}</button></td>
+                        class="button-token-fill-order btn btn-success btn-sm">${buy ? 'Sell' : 'Buy'}</button></td>
                 </tr>
             `)
 
@@ -737,7 +737,7 @@ function updateTokenOrders() {
                             data-amount="${order.real_amount}" 
                             data-tokenid="${order.tokenid}" 
                             data-txid="${order.txid}"
-                            class="button-token-cancel-order btn btn-primary btn-sm">Cancel</button></td>
+                            class="button-token-cancel-order btn btn-success btn-sm">Cancel</button></td>
                     </tr>
                 `)            
             }
