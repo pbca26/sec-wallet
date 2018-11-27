@@ -14,6 +14,9 @@ const default_config = {
     chain_launch_params: '-ac_supply=100000 -addnode=95.216.196.64 -ac_cc=1337 -printtoconsole'
 }
 
+// Example launch command
+// /Users/naezith/Documents/komodo/src/komodod -ac_name=NAE -ac_supply=100000 -addnode=95.216.196.64 -ac_cc=1337 -gen -printtoconsole -pubkey=02d8a4e1091ab538769e302ddfe77ca65acca625d79b658b3872172be9b752b23d
+
 // Data
 let komodod_path = undefined
 let cli_path = undefined
@@ -62,46 +65,61 @@ function readConfig() {
     cli_args = '-ac_name=' + config.chain_name
 }
 
+function prepareDaemon(needs_keygen) {
+    return new Promise((resolve, reject) => {
+        launchDaemon(keypair.pubkey).then(() => {
+            importPrivKey(keypair.privkey).then(() => {
+                getAddressFromPubkey(keypair.pubkey).then(addr_info => {
+                    keypair.address = addr_info.address
+                    keypair.CCaddress = addr_info.CCaddress
+
+                    resolve({ 
+                        generated: needs_keygen, 
+                        privkey: keypair.privkey, 
+                        pubkey: keypair.pubkey, 
+                        address: addr_info.address 
+                    })
+                })
+            })
+        }).catch(e => {
+            console.log('Failed to launch daemon.')
+            console.log('Error:', e)
+            console.log('Stopping the daemon...')
+            stopDaemon().then(() => {
+                console.log('Stopped the daemon... Trying to launch daemon again')
+                prepareDaemon().then(data => resolve(data))
+            })
+        })
+    })
+}
+
+
 function startUp(pubkey) {
     return new Promise((resolve, reject) => {
-        // If pubkey does not exist: First launch, or generating a new one
-        if(pubkey === '') {
+        // If pubkey does not exist: It's the first launch, or asks to generate a new key
+        let needs_keygen = pubkey === ''
+
+        if(needs_keygen) {
             keypair = keygen.generateKeyPair()
             pubkey = keypair.pubkey
 
             console.log('Generated pair: ')
             console.log('privkey: ' + keypair.privkey)
             console.log('pubkey: ' + keypair.pubkey)
-            
-            launchDaemon(pubkey).then(() => {
-                importPrivKey(keypair.privkey).then(() => {
-                    getAddressFromPubkey(pubkey).then(addr_info => {
-                        keypair.address = addr_info.address
-                        keypair.CCaddress = addr_info.CCaddress
-                        resolve({ generated: true, privkey: keypair.privkey, pubkey, address: addr_info.address })
-                    })
-                })
-            })
         }
         // If pubkey exists
         else {
             keypair = { privkey: '', pubkey }
         
-            console.log('Launching with existing pubkey:')
-            console.log('pubkey: ' + pubkey)
-            
-            launchDaemon(pubkey).then(() => {
-                getAddressFromPubkey(pubkey).then(addr_info => {
-                    keypair.address = addr_info.address
-                    keypair.CCaddress = addr_info.CCaddress
-                    resolve({ generated: false, privkey: keypair.privkey, pubkey, address: addr_info.address })
-                })
-            })
+            console.log('Launching with existing pubkey:' + pubkey)
         }
+            
+        // Launch the daemon
+        prepareDaemon(needs_keygen).then(data => resolve(data))
     })
 }
 
-
+let daemon_count = 0
 function launchDaemon(pubkey) {
     return new Promise((resolve, reject) => {
         let command = komodod_path + config.chain_launch_params + ' -pubkey=' + pubkey
@@ -111,9 +129,16 @@ function launchDaemon(pubkey) {
 
         console.log('Launching the daemon... \n' + command)
         komodod = child_process.spawn(program, args)
+        ++daemon_count
 
         komodod.stdout.on('data', data => {
-            console.log('komodod stdout: ' + data)
+            console.log(' komodod ' + daemon_count + ' stdout: ' + data)
+
+
+            // If it's already open
+            if(data.indexOf('Komodo is probably already running') !== -1) {
+                reject('Komodo is probably already running')
+            }
 
             // Wait until komodod is ready
             if(data.indexOf('init message: Done loading') !== -1) {
@@ -139,8 +164,10 @@ function stopDaemon() {
         console.log('Stopping the daemon...')
         child_process.execFile(cli_path, to_cli_args('stop'), (error, stdout, stderr) => {
 
-            let timeout = setTimeout(() => { resolve() }, 60000)
+            // Wait a bit and tell that it's done, not being sure
+            let timeout = setTimeout(() => { resolve() }, 20000)
 
+            // If we get a close signal, that's it
             komodod.on('close', code => {
                 clearTimeout(timeout)
                 
@@ -283,6 +310,11 @@ function getTokenOrders() {
 function importPrivKey(key) {
     console.log('Importing privkey: ' + key)
     return new Promise((resolve, reject) => {
+        if(key === '') {
+            console.log('No need to import privkey, it is empty.')
+            return resolve('empty_key')
+        }
+
         child_process.execFile(cli_path, to_cli_args('importprivkey ' + key), (error, stdout, stderr) => {
 
             if(stderr) {
