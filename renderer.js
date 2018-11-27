@@ -868,8 +868,11 @@ function openPage(page) {
 $("#menu-toggle").click(function(e) {
     e.preventDefault()
     $("#wrapper").toggleClass("toggled")
+
+    $("#menu-toggle").text($("#wrapper").hasClass("toggled") ? '<' : '>')
 })
 
+$("#menu-toggle").trigger('click')
 
 function stripZeros(float) {
     return (float * 1).toString()
