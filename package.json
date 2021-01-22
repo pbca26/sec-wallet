@@ -20,8 +20,8 @@
     "asymmetric-crypto": "^1.0.2",
     "bitcoinjs-lib": "^4.0.2",
     "bootstrap": "^4.1.3",
-    "electron": "^3.0.4",
-    "jquery": "^3.3.1",
+    "electron": "^7.2.4",
+    "jquery": "^3.5.0",
     "popper.js": "^1.14.4"
   },
   "standard": {
