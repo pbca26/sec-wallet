@@ -1,4 +1,4 @@
-Edit the variables in api/daemon.js
+Edit the `default_config` fields in `api/daemon.js`
 
 It's an Electron.js project so you can run it with:
 
