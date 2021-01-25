@@ -21,7 +21,13 @@ function setLoading(status) {
 
 function createWindow () {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 800, height: 600})
+  mainWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      nodeIntegration: true,
+    },
+  });
   mainWindow.setMinimumSize(600, 500)
 
   // and load the index.html of the app.
