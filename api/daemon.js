@@ -6,6 +6,8 @@ const keygen = require('./keygen.js')
 
 const os = require('os')
 const platform = os.platform()
+const path = require('path');
+const fixPath = require('fix-path');
 
 const default_config = {
     bin_folder: os.homedir() + '/Documents/komodo/src/',
@@ -545,6 +547,22 @@ function getKomodoFolder() {
 
     // Probably Linux
     return os.homedir() + '/.komodo/' + config.chain_name + '/'  
+}
+
+function getBinsFolder() {
+  switch (platform) {
+    case 'darwin':
+      fixPath();
+      return path.join(__dirname, '../bin/osx/');
+
+    case 'linux':
+      return path.join(__dirname, '../bin/linux64/');
+      break;
+
+    case 'win32':
+      return path.join(__dirname, '../bin/win64/');
+      break;
+  }
 }
 
 module.exports = {
