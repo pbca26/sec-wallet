@@ -4,7 +4,11 @@
   "description": "Tokens CC Wallet",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "debug": "npm start devmode",
+    "pack": "electron-builder --dir kmd-tokens-wallet-unpacked",
+    "dist": "electron-builder --publish=never",
+    "dist-win": "electron-builder --publish=never  --win",
   },
   "keywords": [
     "KMD",
