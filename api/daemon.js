@@ -10,14 +10,11 @@ const path = require('path');
 const fixPath = require('fix-path');
 
 const default_config = {
-    bin_folder: os.homedir() + '/Documents/komodo/src/',
-    chain_name: 'NAE',
-    coin_name: 'NAE',
-    chain_launch_params: '-ac_supply=100000 -addnode=95.216.196.64 -ac_cc=1337 -printtoconsole'
+  bin_folder: getBinsFolder(),
+  chain_name: 'RICK',
+  coin_name: 'RICK',
+  chain_launch_params: '-ac_supply=90000000000 -ac_reward=100000000 -ac_cc=3 -ac_staked=10 -addnode=138.201.136.145 -addnode=95.217.44.58 -printtoconsole'
 }
-
-// Example launch command
-// /Users/naezith/Documents/komodo/src/komodod -ac_name=NAE -ac_supply=100000 -addnode=95.216.196.64 -ac_cc=1337 -gen -printtoconsole -pubkey=02d8a4e1091ab538769e302ddfe77ca65acca625d79b658b3872172be9b752b23d
 
 // Data
 let komodod_path = undefined
