@@ -378,7 +378,7 @@ function broadcastTX(raw_tx) {
 
             if(stderr) {
                 console.log('BroadcastTX Failed: ' + stderr)
-                reject(stderr)
+                reject(raw_tx && raw_tx.substr(0, 2) !== '04' ? 'Error: ' + raw_tx : stderr)
             }
 
             if(stdout) {
