@@ -34,6 +34,7 @@ let preventWindowClose = false
 let main = require('electron').remote.require('./main.js')
 let mainWindow = require('electron').remote.getCurrentWindow()
 
+
 function setPreventWindowClose(toggle) {
     main.setPreventWindowClose(toggle)
     preventWindowClose = toggle
@@ -606,9 +607,9 @@ actions.forEach(action => {
         
         
         // Create token
-        daemon.createTokenTradeOrder(action, supply, tokenid, price).then(() => {            
+        daemon.createTokenTradeOrder(action, supply, tokenid, price).then((txid) => {            
             statusAlert(true, addToHistory('Created token order, ' + action + 'ing ' + supply + ' ' + name +
-                                ' for ' + stripZeros(price) + ' ' + daemon.getCoinName() + ' each. \nTransaction ID: ' + tokenid))
+                                ' for ' + stripZeros(price) + ' ' + daemon.getCoinName() + ' each. \nTransaction ID: ' + txid))
         }).catch(e => {
             statusAlert(false, 'Could not create token trade order: ' + e)
         })
