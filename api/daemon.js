@@ -419,9 +419,9 @@ function sendTokenToAddress(token_id, address, amount) {
 
 function createToken(name, supply, description) {
     return new Promise((resolve, reject) => {
-        console.log('Creating token ' + name + ', supply: ' + supply + ' description: ' + description)
+        console.log('Creating token ' + name + ', supply: ' + supply + ' (' + (supply * 0.00000001) + ') ' + ' description: ' + description)
         
-        let args = to_cli_args('tokencreate ' + name + ' ' + supply)
+        let args = to_cli_args('tokencreate ' + name + ' ' + supply * 0.00000001)
         if(description !== '') args.push('"' + description + '"')
 
         child_process.execFile(cli_path, args, (error, stdout, stderr) => {
