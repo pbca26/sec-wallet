@@ -33,7 +33,12 @@ let preventWindowClose = false
 // On close
 let main = require('electron').remote.require('./main.js')
 let mainWindow = require('electron').remote.getCurrentWindow()
+let { shell } = require('electron')
 
+
+function openExtLink(url) {
+  shell.openExternal(url)
+}
 
 function setPreventWindowClose(toggle) {
     main.setPreventWindowClose(toggle)
@@ -556,10 +561,16 @@ $('#form-create-token-submit').submit(event => {
     }
 
     // Create token
-    daemon.createToken(name, supply, description).then(() => {
-        statusAlert(true, addToHistory('Created token ' + name + 
+    daemon.createToken(name, supply, description).then((createTokenTxid) => {
+        statusAlert(true, 'Created token ' + name + 
                                 (description !== '' ? ('(' + description + ')') : '')
-                                + ' with ' +  supply + ' ' + daemon.getCoinName()))
+                                + ' with ' +  supply + ' ' + daemon.getCoinName() + '\nTransaction ID: <a href="#" id="txid-link">' + createTokenTxid + '</a>')
+        $('#txid-link').on('click', function(e) {
+          openExtLink('http://www.atomicexplorer.com:10026/#/tokens/contract/RICK/' + createTokenTxid);
+        })
+        addToHistory('Created token ' + name + 
+        (description !== '' ? ('(' + description + ')') : '')
+        + ' with ' +  supply + ' ' + daemon.getCoinName() + '\nTransaction ID: ' + createTokenTxid)
     }).catch(e => {
         statusAlert(false, 'Failed to create token: ' + e)
     })
@@ -605,11 +616,15 @@ actions.forEach(action => {
             }
         }
         
-        
         // Create token
-        daemon.createTokenTradeOrder(action, supply, tokenid, price).then((txid) => {            
-            statusAlert(true, addToHistory('Created token order, ' + action + 'ing ' + supply + ' ' + name +
-                                ' for ' + stripZeros(price) + ' ' + daemon.getCoinName() + ' each. \nTransaction ID: ' + txid))
+        daemon.createTokenTradeOrder(action, supply, tokenid, price).then((sellTokenOrderTxid) => {            
+            statusAlert(true, 'Created token order, ' + action + 'ing ' + supply + ' ' + name +
+            ' for ' + stripZeros(price) + ' ' + daemon.getCoinName() + ' each. \nTransaction ID: <a href="#" id="txid-link">' + sellTokenOrderTxid + '</a>')
+            addToHistory('Created token order, ' + action + 'ing ' + supply + ' ' + name +
+            ' for ' + stripZeros(price) + ' ' + daemon.getCoinName() + ' each. \nTransaction ID: ' + sellTokenOrderTxid)
+            $('#txid-link').on('click', function(e) {
+              openExtLink('http://www.atomicexplorer.com:10026/#/tokens/transaction/RICK/' + tokenid + '/' + sellTokenOrderTxid);
+            })
         }).catch(e => {
             statusAlert(false, 'Could not create token trade order: ' + e)
         })
@@ -725,6 +740,7 @@ function updateTokenOrders() {
 
 
             // If it's my order, add them to the my orders tables
+            console.warn('my address ' + my_address + ' vs order address ' + order.origaddress + ', order id: ' + order.txid);
             if(my_address === order.origaddress) {
                 $('#table-token-my-' + (buy ? 'buy' : sell ? 'sell' : 'unknown-func')).append(`
                     <tr>
@@ -840,11 +856,19 @@ $('#form-token-fill-order-submit').submit(event => {
 
     daemon.fillTokenOrder(action, tokenid, txid, count).then(fill_order_id => {
         // Update status text
-        statusAlert(true, addToHistory('Filling token order, ' + action + 'ing ' + 
+        statusAlert(true, 'Filling token order, ' + action + 'ing ' + 
                                 count + ' ' + name + ' for ' + stripZeros(price) + ' ' + daemon.getCoinName() + ' each.' +
                                         '\nTokenID: ' + tokenid + 
                                         '\nOrder ID: ' + txid + 
-                                        '\nFill Order ID: ' + fill_order_id))
+                                        '\nFill Order ID: <a href="#" id="txid-link">' + fill_order_id + '</a>')
+        addToHistory('Filling token order, ' + action + 'ing ' + 
+          count + ' ' + name + ' for ' + stripZeros(price) + ' ' + daemon.getCoinName() + ' each.' +
+                  '\nTokenID: ' + tokenid + 
+                  '\nOrder ID: ' + txid + 
+                  '\nFill Order ID: ' + fill_order_id)
+        $('#txid-link').on('click', function(e) {
+          openExtLink('http://www.atomicexplorer.com:10026/#/tokens/transactions/RICK/' + tokenid);
+        })
     }).catch(e => {
         statusAlert(false, e)
     })
@@ -878,3 +902,8 @@ $("#menu-toggle").trigger('click')
 function stripZeros(float) {
     return (float * 1).toString()
 }
+
+$("#nav-explorer").click(function(e) {
+  e.preventDefault()
+  openExtLink('http://www.atomicexplorer.com:10026/#/tokens')
+})
