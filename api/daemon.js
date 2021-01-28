@@ -142,6 +142,19 @@ function launchDaemon(pubkey) {
             // Wait until komodod is ready
             if(data.indexOf('init message: Done loading') !== -1) {
                 resolve()
+                if (!keypair.CCaddress) {
+                  getAddressFromPubkey(keypair.pubkey).then(addr_info => {
+                    keypair.address = addr_info.address
+                    keypair.CCaddress = addr_info.CCaddress
+
+                    resolve({ 
+                        generated: false, 
+                        privkey: keypair.privkey, 
+                        pubkey: keypair.pubkey, 
+                        address: addr_info.address 
+                    })
+                  })
+                }
             }
 
             // If komodod is closed, let stopDaemon function know about it
@@ -280,30 +293,30 @@ function getTokenList() {
 }
 
 function getTokenOrders() {
-    return new Promise((resolve, reject) => {
-        child_process.execFile(cli_path, to_cli_args('tokenorders'), (error, stdout, stderr) => {
+  return new Promise((resolve, reject) => {
+      child_process.execFile(cli_path, to_cli_args('tokenorders'), (error, stdout, stderr) => {
 
-            if(stderr) {
-                console.log('getTokenOrders failed: ', stderr)
-                reject(stderr)
-            }
+          if(stderr) {
+              console.log('getTokenOrders failed: ', stderr)
+              reject(stderr)
+          }
 
-            if(stdout) {
-                let orders = JSON.parse(stdout)
-    
-                // Get token information
-                Promise.all(orders.map(t => {
-                    return new Promise((resolve, reject) => {
-                        // Get name and balance
-                        Promise.all([
-                            getTokenName(t.tokenid).then(name => { t.name = name; })                     
-                        ]).then(() => { resolve() })
-                    })
-                })).then(() => { resolve(orders) })
-            }
+          if(stdout) {
+              let orders = JSON.parse(stdout)
+  
+              // Get token information
+              Promise.all(orders.map(t => {
+                  return new Promise((resolve, reject) => {
+                      // Get name and balance
+                      Promise.all([
+                          getTokenName(t.tokenid).then(name => { t.name = name; })                     
+                      ]).then(() => { resolve() })
+                  })
+              })).then(() => { resolve(orders) })
+          }
 
-        })
-    })
+      })
+  })
 }
 
 function importPrivKey(key) {
@@ -341,7 +354,8 @@ function getAddressFromPubkey(pubkey) {
 
             if(stdout) {
                 let json = JSON.parse(stdout)
-                resolve({ address: json.myaddress, CCaddress: json.CCaddress, } )
+                // console.log('getAddressFromPubkey success: ', json)
+                resolve({ address: json.myaddress, CCaddress: json['PubkeyCCaddress(Tokens)'], } )
             }
 
         })
