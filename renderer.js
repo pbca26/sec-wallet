@@ -336,6 +336,7 @@ function init(pubkey) {
 
             // Set UI Values
             updateNewAddress(wallet.address)
+            $('#myccaddress').val(daemon.getKeyPair().CCaddress);
             Promise.all([
                 updateBalance(),
                 updateTokenLists(),
