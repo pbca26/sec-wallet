@@ -35,16 +35,16 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: kmd-tokens-wallet-osx-${{ env.BASE_BRANCH }}-dmg
-        path: ./electron/kmd-tokens-wallet-osx-${{ env.BASE_BRANCH }}-dmg.tar.gz
+        path: ./kmd-tokens-wallet-osx-${{ env.BASE_BRANCH }}-dmg.tar.gz
 
     - name: Upload kmd-tokens-wallet-osx-${{ env.BASE_BRANCH }}-dmg.tar.gz as artifact
       env:
         BASE_BRANCH: ${{ github.base_ref }}
-        APP_VERSION: $( node -pe "require('./electron/package.json').version" )
+        APP_VERSION: $( node -pe "require('./package.json').version" )
       uses: actions/upload-artifact@v1
       with:
         name: kmd-tokens-wallet-osx-${{ env.BASE_BRANCH }}-portable
-        path: ./electron/kmd-tokens-wallet-osx-${{ env.BASE_BRANCH }}-portable.tar.gz
+        path: ./kmd-tokens-wallet-osx-${{ env.BASE_BRANCH }}-portable.tar.gz
 
   job-linux-build:
     name: Build (Linux)
@@ -72,29 +72,29 @@ jobs:
     - name: Upload kmd-tokens-wallet-linux-${{ env.BASE_BRANCH  }}-portable.tar.gz as artifact
       env:
         BASE_BRANCH: ${{ github.base_ref }}
-        APP_VERSION: $( node -pe "require('./electron/package.json').version" )
+        APP_VERSION: $( node -pe "require('./package.json').version" )
       uses: actions/upload-artifact@v1
       with:
         name: kmd-tokens-wallet-linux-${{ env.BASE_BRANCH  }}-portable
-        path: ./electron/kmd-tokens-wallet-linux-${{ env.BASE_BRANCH  }}-portable.tar.gz
+        path: ./kmd-tokens-wallet-linux-${{ env.BASE_BRANCH  }}-portable.tar.gz
 
     - name: Upload kmd-tokens-wallet-linux-${{ env.BASE_BRANCH  }}-appimage.tar.gz as artifact
       env:
         BASE_BRANCH: ${{ github.base_ref }}
-        APP_VERSION: $( node -pe "require('./electron/package.json').version" )
+        APP_VERSION: $( node -pe "require('./package.json').version" )
       uses: actions/upload-artifact@v1
       with:
         name: kmd-tokens-wallet-linux-${{ env.BASE_BRANCH  }}-appimage
-        path: ./electron/kmd-tokens-wallet-linux-${{ env.BASE_BRANCH  }}-appimage.tar.gz
+        path: ./kmd-tokens-wallet-linux-${{ env.BASE_BRANCH  }}-appimage.tar.gz
 
     - name: Upload kmd-tokens-wallet-linux-${{ env.BASE_BRANCH  }}-snap.tar.gz as artifact
       env:
         BASE_BRANCH: ${{ github.base_ref }}
-        APP_VERSION: $( node -pe "require('./electron/package.json').version" )
+        APP_VERSION: $( node -pe "require('./package.json').version" )
       uses: actions/upload-artifact@v1
       with:
         name: kmd-tokens-wallet-linux-${{ env.BASE_BRANCH  }}-snap
-        path: ./electron/kmd-tokens-wallet-linux-${{ env.BASE_BRANCH  }}-snap.tar.gz
+        path: ./kmd-tokens-wallet-linux-${{ env.BASE_BRANCH  }}-snap.tar.gz
 
   job-win-build:
     name: Build (Windows)
@@ -121,20 +121,20 @@ jobs:
     - name: Upload kmd-tokens-wallet-win-${{ env.BASE_BRANCH }}-portable.tar.gz as artifact
       env:
         BASE_BRANCH: ${{ github.base_ref }}
-        APP_VERSION: $( node -pe "require('./electron/package.json').version" )
+        APP_VERSION: $( node -pe "require('./package.json').version" )
       uses: actions/upload-artifact@v1
       with:
         name: kmd-tokens-wallet-win-${{ env.BASE_BRANCH }}-portable
-        path: ./electron/kmd-tokens-wallet-win-${{ env.BASE_BRANCH }}-portable.tar.gz
+        path: ./kmd-tokens-wallet-win-${{ env.BASE_BRANCH }}-portable.tar.gz
 
     - name: Upload kmd-tokens-wallet-win-${{ env.BASE_BRANCH }}-setup.tar.gz as artifact
       env:
         BASE_BRANCH: ${{ github.base_ref }}
-        APP_VERSION: $( node -pe "require('./electron/package.json').version" )
+        APP_VERSION: $( node -pe "require('./package.json').version" )
       uses: actions/upload-artifact@v1
       with:
         name: kmd-tokens-wallet-win-${{ env.BASE_BRANCH }}-setup
-        path: ./electron/kmd-tokens-wallet-win-${{ env.BASE_BRANCH }}-setup.tar.gz
+        path: ./kmd-tokens-wallet-win-${{ env.BASE_BRANCH }}-setup.tar.gz
 
   job-release:
     name: Release
