@@ -293,29 +293,51 @@ function getTokenList() {
 }
 
 function getTokenOrders() {
-  return new Promise((resolve, reject) => {
-      child_process.execFile(cli_path, to_cli_args('tokenorders'), (error, stdout, stderr) => {
+    return new Promise((resolve, reject) => {
+      child_process.execFile(cli_path, to_cli_args('mytokenorders'), (error1, stdout1, stderr1) => {
+        if(stderr1) {
+            console.log('getTokenOrders failed (mytokenorders): ', stderr1)
+            reject(stderr1)
+        }
 
-          if(stderr) {
-              console.log('getTokenOrders failed: ', stderr)
-              reject(stderr)
-          }
+        if(stdout1) {
+            let myorders = JSON.parse(stdout1)
+            //console.warn('myorders', myorders);
 
-          if(stdout) {
-              let orders = JSON.parse(stdout)
+            child_process.execFile(cli_path, to_cli_args('tokenorders'), (error, stdout, stderr) => {
+              
+              if(stderr) {
+                  console.log('getTokenOrders failed: ', stderr)
+                  reject(stderr)
+              }
   
-              // Get token information
-              Promise.all(orders.map(t => {
-                  return new Promise((resolve, reject) => {
-                      // Get name and balance
-                      Promise.all([
-                          getTokenName(t.tokenid).then(name => { t.name = name; })                     
-                      ]).then(() => { resolve() })
-                  })
-              })).then(() => { resolve(orders) })
-          }
+              if(stdout) {
+                  let orders = JSON.parse(stdout)
+      
+                  // Get token information
+                  Promise.all(orders.map(t => {
+                      return new Promise((resolve, reject) => {
+                          // Get name and balance
+                          Promise.all([
+                              getTokenName(t.tokenid).then(name => {
+                                t.name = name;
 
-      })
+                                for (let i = 0; i < myorders.length; i++) {
+                                  if (t.txid === myorders[i].txid) {
+                                    // console.warn('my order ' + t.txid);
+                                    t.isMine = true;
+                                  }
+                                }
+                              })                     
+                          ]).then(() => { resolve() })
+                      })
+                  })).then(() => { resolve(orders) })
+              }
+
+            })
+        }
+
+    })
   })
 }
 
