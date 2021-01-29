@@ -1,5 +1,5 @@
 {
-  "name": "tokens-cc-wallet",
+  "name": "kmd-tokens-wallet",
   "version": "0.0.2",
   "description": "Tokens CC Wallet",
   "main": "main.js",
