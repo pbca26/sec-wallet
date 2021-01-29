@@ -1,7 +1,7 @@
 'use strict'
 
-window.$ = window.jQuery = require('jquery')
-window.Bootstrap = require('bootstrap')
+window.$ = window.jQuery = require('./node_modules/jquery/dist/jquery.js')
+window.Bootstrap = require('./node_modules/bootstrap/dist/js/bootstrap.js')
 
 ////// SET PAGES 
 // Main pages
