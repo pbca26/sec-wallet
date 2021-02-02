@@ -651,4 +651,5 @@ module.exports = {
     cancelTokenOrder,
     readConfig,
     forceImportKey,
+    chainName: default_config.chain_name,
 } 

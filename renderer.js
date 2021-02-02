@@ -574,7 +574,7 @@ $('#form-create-token-submit').submit(event => {
                                 (description !== '' ? ('(' + description + ')') : '')
                                 + ' with ' +  supply + ' ' + daemon.getCoinName() + '\nTransaction ID: <a href="#" id="txid-link">' + createTokenTxid + '</a>')
         $('#txid-link').on('click', function(e) {
-          openExtLink('http://www.atomicexplorer.com:10026/#/tokens/contract/RICK/' + createTokenTxid);
+          openExtLink('http://www.atomicexplorer.com:10026/#/tokens/contract/' + daemon.chainName + '/' + createTokenTxid);
         })
         addToHistory('Created token ' + name + 
         (description !== '' ? ('(' + description + ')') : '')
@@ -631,7 +631,7 @@ actions.forEach(action => {
             addToHistory('Created token order, ' + action + 'ing ' + supply + ' ' + name +
             ' for ' + stripZeros(price) + ' ' + daemon.getCoinName() + ' each. \nTransaction ID: ' + sellTokenOrderTxid)
             $('#txid-link').on('click', function(e) {
-              openExtLink('http://www.atomicexplorer.com:10026/#/tokens/transaction/RICK/' + tokenid + '/' + sellTokenOrderTxid);
+              openExtLink('http://www.atomicexplorer.com:10026/#/tokens/transaction/' + daemon.chainName + '/' + tokenid + '/' + sellTokenOrderTxid);
             })
         }).catch(e => {
             statusAlert(false, 'Could not create token trade order: ' + e)
@@ -875,7 +875,7 @@ $('#form-token-fill-order-submit').submit(event => {
                   '\nOrder ID: ' + txid + 
                   '\nFill Order ID: ' + fill_order_id)
         $('#txid-link').on('click', function(e) {
-          openExtLink('http://www.atomicexplorer.com:10026/#/tokens/transactions/RICK/' + tokenid);
+          openExtLink('http://www.atomicexplorer.com:10026/#/tokens/transactions/' + daemon.chainName + '/' + tokenid);
         })
     }).catch(e => {
         statusAlert(false, e)
