@@ -482,7 +482,14 @@ $('#button-show-keys').click(event => {
     $('#text-last-pubkey').val(store.get('generated_pubkey'))
 })
 
+$('#button-import-keys').click(event => {
+  event.preventDefault()
 
+  daemon.forceImportKey({
+    privkey: store.data.first_privkey,
+    pubkey: store.data.pubkey,
+  });
+})
 
 
 $('#button-change-pubkey').click(event => {

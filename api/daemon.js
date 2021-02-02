@@ -80,6 +80,24 @@ function readConfig() {
     cli_args = '-ac_name=' + config.chain_name
 }
 
+function forceImportKey(keypair) {
+  return new Promise((resolve, reject) => {
+    importPrivKey(keypair.privkey).then(() => {
+      getAddressFromPubkey(keypair.pubkey).then(addr_info => {
+          keypair.address = addr_info.address
+          keypair.CCaddress = addr_info.CCaddress
+
+          resolve({ 
+              generated: false, 
+              privkey: keypair.privkey, 
+              pubkey: keypair.pubkey, 
+              address: addr_info.address 
+          })
+      })
+    })
+  })
+}
+
 function prepareDaemon(needs_keygen) {
     return new Promise((resolve, reject) => {
         launchDaemon(keypair.pubkey).then(() => {
@@ -631,5 +649,6 @@ module.exports = {
     getTokenOrders,
     fillTokenOrder,
     cancelTokenOrder,
-    readConfig
+    readConfig,
+    forceImportKey,
 } 
