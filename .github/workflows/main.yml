@@ -24,6 +24,8 @@ jobs:
         APP_VERSION: $( node -pe "require('./package.json').version" )
       run: |
         ./fetch-kmd-bins.sh
+        rm -rf bin/linux64
+        rm -rf bin/win64
         npm install
         npm run dist
         tar -czvf kmd-tokens-wallet-osx-${{ env.BASE_BRANCH }}-portable.tar.gz dist/mac
@@ -63,6 +65,8 @@ jobs:
         APP_VERSION: $( node -pe "require('./package.json').version" )
       run: |
         ./fetch-kmd-bins.sh
+        rm -rf bin/osx
+        rm -rf bin/win64
         npm install
         npm run dist
         tar -czvf kmd-tokens-wallet-linux-${{ env.BASE_BRANCH }}-portable.tar.gz dist/linux-unpacked
@@ -112,7 +116,13 @@ jobs:
         BASE_BRANCH: ${{ github.base_ref }}
         APP_VERSION: $( node -pe "require('./package.json').version" )
       run: |
-        ./fetch-kmd-bins.sh
+        mkdir bin
+        mkdir bin/win64
+        cd bin/win64
+        curl https://github.com/pbca26/komodod/releases/download/cd_release_8688665_dev/komodo_8688665_dev_win.zip --output komodod.zip
+        unzip komodod.zip
+        rm komodod.zip
+        cd ../../
         npm install
         npm run dist
         tar -czvf kmd-tokens-wallet-win-${{ env.BASE_BRANCH }}-portable.tar.gz dist/win-unpacked
