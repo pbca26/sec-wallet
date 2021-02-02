@@ -1,7 +1,7 @@
 'use strict'
 
-window.$ = window.jQuery = require('./node_modules/jquery/dist/jquery.js')
-window.Bootstrap = require('./node_modules/bootstrap/dist/js/bootstrap.js')
+window.$ = window.jQuery = require('jquery')
+window.Bootstrap = require('bootstrap')
 
 ////// SET PAGES 
 // Main pages
@@ -741,7 +741,7 @@ function updateTokenOrders() {
 
 
             // If it's my order, add them to the my orders tables
-            console.warn('my address ' + my_address + ' vs order address ' + order.origaddress + ', order id: ' + order.txid);
+            // console.warn('my address ' + my_address + ' vs order address ' + order.origaddress + ', order id: ' + order.txid);
             if(order.isMine) {
                 $('#table-token-my-' + (buy ? 'buy' : sell ? 'sell' : 'unknown-func')).append(`
                     <tr>

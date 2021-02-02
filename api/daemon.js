@@ -338,7 +338,7 @@ function getTokenOrders() {
         }
 
     })
-  })
+    })
 }
 
 function importPrivKey(key) {
