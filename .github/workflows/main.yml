@@ -24,6 +24,8 @@ jobs:
         APP_VERSION: $( node -pe "require('./package.json').version" )
       run: |
         ./fetch-kmd-bins.sh
+        rm -rf bin/linux64
+        rm -rf bin/win64
         npm install
         npm run dist
         tar -czvf kmd-tokens-wallet-osx-${{ env.BASE_BRANCH }}-portable.tar.gz dist/mac
@@ -63,6 +65,8 @@ jobs:
         APP_VERSION: $( node -pe "require('./package.json').version" )
       run: |
         ./fetch-kmd-bins.sh
+        rm -rf bin/osx
+        rm -rf bin/win64
         npm install
         npm run dist
         tar -czvf kmd-tokens-wallet-linux-${{ env.BASE_BRANCH }}-portable.tar.gz dist/linux-unpacked
@@ -113,6 +117,11 @@ jobs:
         APP_VERSION: $( node -pe "require('./package.json').version" )
       run: |
         ./fetch-kmd-bins.sh
+        ls -l
+        cd bin
+        rmdir /s linux64
+        rmdir /s osx
+        cd ../
         npm install
         npm run dist
         tar -czvf kmd-tokens-wallet-win-${{ env.BASE_BRANCH }}-portable.tar.gz dist/win-unpacked
