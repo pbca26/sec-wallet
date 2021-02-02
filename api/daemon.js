@@ -9,11 +9,22 @@ const platform = os.platform()
 const path = require('path');
 const fixPath = require('fix-path');
 
-const default_config = {
-  bin_folder: getBinsFolder(),
-  chain_name: 'RICK',
-  coin_name: 'RICK',
-  chain_launch_params: '-ac_supply=90000000000 -ac_reward=100000000 -ac_cc=3 -ac_staked=10 -addnode=138.201.136.145 -addnode=95.217.44.58 -printtoconsole'
+let default_config;
+
+if (process.argv.indexOf('chain=rick') > -1) {
+  default_config = {
+    bin_folder: getBinsFolder(),
+    chain_name: 'RICK',
+    coin_name: 'RICK',
+    chain_launch_params: '-ac_supply=90000000000 -ac_reward=100000000 -ac_cc=3 -ac_staked=10 -addnode=138.201.136.145 -addnode=95.217.44.58 -printtoconsole'
+  }
+} else {
+  default_config = {
+    bin_folder: getBinsFolder(),
+    chain_name: 'WSB',
+    coin_name: 'WSB',
+    chain_launch_params: '-ac_supply=90000000000 -ac_cc=3 -ac_reward=100000000 -addnode=94.130.38.173 -addnode=178.63.47.105 -printtoconsole'
+  }
 }
 
 // Data
@@ -49,6 +60,11 @@ function readConfig() {
     }
     catch(exception) {
         console.log('Config file does not exist or has invalid JSON, generating the default one' + config_path)
+    }
+
+    if (!fs.existsSync(getKomodoFolder())) {
+      console.log('Dir ' + getKomodoFolder() + ' doesn\'t exist, create new');
+      fs.mkdirSync(getKomodoFolder());
     }
 
     // Write config
