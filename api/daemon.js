@@ -9,6 +9,8 @@ const platform = os.platform()
 const path = require('path');
 const fixPath = require('fix-path');
 
+const chains = require('./chains');
+
 let default_config;
 
 if (process.argv.indexOf('chain=rick') > -1) {
@@ -16,15 +18,29 @@ if (process.argv.indexOf('chain=rick') > -1) {
     bin_folder: getBinsFolder(),
     chain_name: 'RICK',
     coin_name: 'RICK',
-    chain_launch_params: '-ac_supply=90000000000 -ac_reward=100000000 -ac_cc=3 -ac_staked=10 -addnode=138.201.136.145 -addnode=95.217.44.58 -printtoconsole'
+    chain_launch_params: chains.RICK + ' -printtoconsole'
   }
 } else {
   default_config = {
     bin_folder: getBinsFolder(),
     chain_name: 'WSB',
     coin_name: 'WSB',
-    chain_launch_params: '-ac_supply=90000000000 -ac_cc=3 -ac_reward=100000000 -addnode=94.130.38.173 -addnode=178.63.47.105 -printtoconsole'
+    chain_launch_params: chains.WSB + ' -printtoconsole'
   }
+}
+
+function setChain(chain) {
+  default_config = {
+    bin_folder: getBinsFolder(),
+    chain_name: chain,
+    coin_name: chain,
+    chain_launch_params: chains[chain].params + ' -printtoconsole'
+  };
+
+  config.coin_name = chain;
+
+  console.warn('setChain config', default_config);
+  readConfig();
 }
 
 // Data
@@ -43,7 +59,7 @@ function to_cli_args(command) {
 function readConfig() {
     // Set default
     config = { ...default_config }
-
+    // FIXME
     const config_path = getKomodoFolder() + 'gui_config.json'
     try {
         let data = JSON.parse(fs.readFileSync(config_path))
@@ -86,6 +102,7 @@ function forceImportKey(keypair) {
       getAddressFromPubkey(keypair.pubkey).then(addr_info => {
           keypair.address = addr_info.address
           keypair.CCaddress = addr_info.CCaddress
+          keypair.pubkey = keypair.pubkey
 
           resolve({ 
               generated: false, 
@@ -105,6 +122,7 @@ function prepareDaemon(needs_keygen) {
                 getAddressFromPubkey(keypair.pubkey).then(addr_info => {
                     keypair.address = addr_info.address
                     keypair.CCaddress = addr_info.CCaddress
+                    keypair.pubkey = keypair.pubkey
 
                     resolve({ 
                         generated: needs_keygen, 
@@ -180,6 +198,7 @@ function launchDaemon(pubkey) {
                   getAddressFromPubkey(keypair.pubkey).then(addr_info => {
                     keypair.address = addr_info.address
                     keypair.CCaddress = addr_info.CCaddress
+                    keypair.pubkey = keypair.pubkey
 
                     resolve({ 
                         generated: false, 
@@ -213,12 +232,18 @@ function stopDaemon() {
             // Wait a bit and tell that it's done, not being sure
             let timeout = setTimeout(() => { resolve() }, 20000)
 
-            // If we get a close signal, that's it
-            komodod.on('close', code => {
-                clearTimeout(timeout)
-                
-                resolve()
-            })
+            if (komodod) {
+              // If we get a close signal, that's it
+              komodod.on('close', code => {
+                  clearTimeout(timeout)
+                  
+                  resolve()
+              })
+            } else {
+              clearTimeout(timeout)
+              
+              resolve()
+            }
             
         })
     })
@@ -411,7 +436,7 @@ function getAddressFromPubkey(pubkey) {
             if(stdout) {
                 let json = JSON.parse(stdout)
                 // console.log('getAddressFromPubkey success: ', json)
-                resolve({ address: json.myaddress, CCaddress: json['PubkeyCCaddress(Tokens)'], } )
+                resolve({ address: json.myaddress, CCaddress: json['mypk Tokens CC Address'], } )
             }
 
         })
@@ -470,6 +495,8 @@ function sendTokenToAddress(token_id, address, amount) {
                 reject(stderr)
             }
 
+            console.warn('tokentransfer hex', stdout);
+            
             if(stdout) {
                 console.log('tokentransfer ' + address + ' ' + amount)
     
@@ -488,30 +515,30 @@ function sendTokenToAddress(token_id, address, amount) {
 
 
 function createToken(name, supply, description) {
-    return new Promise((resolve, reject) => {
-        console.log('Creating token ' + name + ', supply: ' + supply + ' (' + (supply * 0.00000001) + ') ' + ' description: ' + description)
-        
-        let args = to_cli_args('tokencreate ' + name + ' ' + supply * 0.00000001)
-        if(description !== '') args.push('"' + description + '"')
+  return new Promise((resolve, reject) => {
+      console.log('Creating token ' + name + ', supply: ' + supply + ' (' + (supply * 0.00000001) + ') ' + ' description: ' + description)
+      
+      let args = to_cli_args('tokencreate ' + name + ' ' + supply * 0.00000001)
+      if(description !== '') args.push('"' + description + '"')
 
-        child_process.execFile(cli_path, args, (error, stdout, stderr) => {
+      child_process.execFile(cli_path, args, (error, stdout, stderr) => {
 
-            if(stderr) {
-                console.log('createToken failed: ', stderr)
-                reject(stderr)
-            }
+          if(stderr) {
+              console.log('createToken failed: ', stderr)
+              reject(stderr)
+          }
 
-            if(stdout) {
-                console.log('Broadcasting tokencreate...')
-                broadcastTX(JSON.parse(stdout).hex).then(txid => {
-                    resolve(txid)
-                }).catch(e => {
-                    reject(e)
-                })
-            }
+          if(stdout) {
+              console.log('Broadcasting tokencreate...')
+              broadcastTX(JSON.parse(stdout).hex).then(txid => {
+                  resolve(txid)
+              }).catch(e => {
+                  reject(e)
+              })
+          }
 
-        })
-    })
+      })
+  })
 }
 
 
@@ -651,5 +678,6 @@ module.exports = {
     cancelTokenOrder,
     readConfig,
     forceImportKey,
-    chainName: default_config.chain_name,
+    chains,
+    setChain,
 } 
