@@ -138,7 +138,7 @@
               </div>
             </div>
             <div class="input-group mb-3"></div>
-              My tokens address <input id="myccaddress" type="text" class="form-control" placeholder="Loading the wallet address..." disabled>
+              My tokens address | pubkey <input id="myccaddress" type="text" class="form-control" placeholder="Loading the wallet address..." disabled>
             </div>
           </form>
           </div>
@@ -612,7 +612,21 @@
 
 
 
-
+          <!-- LOADING -->
+          <div class="modal" id="chain-selector" tabindex="-1" role="dialog" aria-labelledby="loader-label">
+            <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-body text-center">
+                  <div class="loader"></div>
+                  <div>
+                    <p id="loader-txt"></p> 
+                    <small>Please choose a chain</small>
+                    <select id="chain-selector-dropdown" style="margin-left: 10px"></select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
 
 
