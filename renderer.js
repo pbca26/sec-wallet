@@ -309,45 +309,69 @@ $('#form-submit-password').submit(event => {
 
 function init(pubkey) {
     return new Promise((resolve, reject) => {
-        inputLock(true, 'Preparing the daemon.')
+      console.warn('init');
 
-        // Launch daemon 
-        daemon.startUp(pubkey).then(wallet => {
-            // Store the key
-            store.set('pubkey', wallet.pubkey)
+      $("#chain-selector").modal({
+        backdrop: "static", // Remove ability to close modal with click
+        keyboard: false, // Remove option to close with keyboard
+        show: true // Display loader!
+      })
 
-            // Save the new pubkey if generated for first time
-            if(wallet.generated) {
-                store.set('generated_privkey', wallet.privkey)
-                store.set('generated_pubkey', wallet.pubkey)
+      var $secondChoice = $("#chain-selector-dropdown");
+      $secondChoice.empty();
+      $secondChoice.append("<option>None</option>");
+      $.each(Object.keys(daemon.chains), function(index, value) {
+        $secondChoice.append("<option>" + value + "</option>");
+      });
 
-                console.log('Firstprivkey : ', store.get('first_privkey'))
-                if(store.get('first_privkey') === '') {
-                    store.set('first_privkey', wallet.privkey)
-                    store.set('first_pubkey', wallet.pubkey)
-                }
-            }
+      $('#chain-selector-dropdown').on('change', function() {
+        console.warn(this.value);
+        
+        if (this.value !== 'None') {
+          daemon.setChain(this.value);
+          $("#chain-selector").modal('hide');
 
-            // // Add block for test
-            // let transactions = []
-            // for(let i = 0; i < 500; ++i)
-            //     transactions.push(daemon.sendToAddress('RKSXk8CSb1tR1WBfx4z4xdedYLHPcPTFTx', 0.01))
-            // Promise.all(transactions, () => { console.log('Sent all') })
-
-            // Set UI Values
-            updateNewAddress(wallet.address)
-            $('#myccaddress').val(daemon.getKeyPair().CCaddress);
-            Promise.all([
-                updateBalance(),
-                updateTokenLists(),
-                updateTokenOrders()
-            ]).then(() => {
-                // Unlock input
-                inputLock(false)
-                
-                resolve()
-            })
-        }) 
+          inputLock(true, 'Preparing the daemon.')
+          
+          // Launch daemon 
+          daemon.startUp(pubkey).then(wallet => {
+              // Store the key
+              store.set('pubkey', wallet.pubkey)
+  
+              // Save the new pubkey if generated for first time
+              if(wallet.generated) {
+                  store.set('generated_privkey', wallet.privkey)
+                  store.set('generated_pubkey', wallet.pubkey)
+  
+                  console.log('Firstprivkey : ', store.get('first_privkey'))
+                  if(store.get('first_privkey') === '') {
+                      store.set('first_privkey', wallet.privkey)
+                      store.set('first_pubkey', wallet.pubkey)
+                  }
+              }
+  
+              // // Add block for test
+              // let transactions = []
+              // for(let i = 0; i < 500; ++i)
+              //     transactions.push(daemon.sendToAddress('RKSXk8CSb1tR1WBfx4z4xdedYLHPcPTFTx', 0.01))
+              // Promise.all(transactions, () => { console.log('Sent all') })
+  
+              // Set UI Values
+              updateNewAddress(wallet.address)
+              $('#myccaddress').val(daemon.getKeyPair().CCaddress + '   |   ' + daemon.getKeyPair().pubkey);
+              Promise.all([
+                  updateBalance(),
+                  updateTokenLists(),
+                  updateTokenOrders()
+              ]).then(() => {
+                  // Unlock input
+                  inputLock(false)
+                  
+                  resolve()
+              })
+          })
+        }
+      });
     })
 }
 
@@ -574,7 +598,7 @@ $('#form-create-token-submit').submit(event => {
                                 (description !== '' ? ('(' + description + ')') : '')
                                 + ' with ' +  supply + ' ' + daemon.getCoinName() + '\nTransaction ID: <a href="#" id="txid-link">' + createTokenTxid + '</a>')
         $('#txid-link').on('click', function(e) {
-          openExtLink('http://www.atomicexplorer.com:10026/#/tokens/contract/' + daemon.chainName + '/' + createTokenTxid);
+          openExtLink('http://www.atomicexplorer.com:10026/#/tokens/contract/' + daemon.getCoinName()  + '/' + createTokenTxid);
         })
         addToHistory('Created token ' + name + 
         (description !== '' ? ('(' + description + ')') : '')
@@ -631,7 +655,7 @@ actions.forEach(action => {
             addToHistory('Created token order, ' + action + 'ing ' + supply + ' ' + name +
             ' for ' + stripZeros(price) + ' ' + daemon.getCoinName() + ' each. \nTransaction ID: ' + sellTokenOrderTxid)
             $('#txid-link').on('click', function(e) {
-              openExtLink('http://www.atomicexplorer.com:10026/#/tokens/transaction/' + daemon.chainName + '/' + tokenid + '/' + sellTokenOrderTxid);
+              openExtLink('http://www.atomicexplorer.com:10026/#/tokens/transaction/' + daemon.getCoinName() + '/' + tokenid + '/' + sellTokenOrderTxid);
             })
         }).catch(e => {
             statusAlert(false, 'Could not create token trade order: ' + e)
@@ -875,7 +899,7 @@ $('#form-token-fill-order-submit').submit(event => {
                   '\nOrder ID: ' + txid + 
                   '\nFill Order ID: ' + fill_order_id)
         $('#txid-link').on('click', function(e) {
-          openExtLink('http://www.atomicexplorer.com:10026/#/tokens/transactions/' + daemon.chainName + '/' + tokenid);
+          openExtLink('http://www.atomicexplorer.com:10026/#/tokens/transactions/' + daemon.getCoinName() + '/' + tokenid);
         })
     }).catch(e => {
         statusAlert(false, e)
