@@ -514,31 +514,48 @@ function sendTokenToAddress(token_id, address, amount) {
 
 
 
-function createToken(name, supply, description) {
-  return new Promise((resolve, reject) => {
-      console.log('Creating token ' + name + ', supply: ' + supply + ' (' + (supply * 0.00000001) + ') ' + ' description: ' + description)
-      
-      let args = to_cli_args('tokencreate ' + name + ' ' + supply * 0.00000001)
-      if(description !== '') args.push('"' + description + '"')
+function createToken(name, supply, description, opreturn) {
+    return new Promise((resolve, reject) => {
+        console.log('Creating token ' + name + ', supply: ' + supply + ' (' + (supply * 0.00000001) + ') ' + ' description: ' + description)
+        
+        if (opreturn && opreturn !== null) {
+          console.warn('Create token NFT', opreturn)
+          opreturn = Buffer.from(JSON.stringify(opreturn)).toString('hex')
+          console.warn('NTF opreturn hex', opreturn)
+        }
 
-      child_process.execFile(cli_path, args, (error, stdout, stderr) => {
+        let args = to_cli_args('tokencreate ' + name + ' ' + supply * 0.00000001)
+        if(description !== '') args.push('"' + description + '"')
+        if(opreturn && opreturn !== null) args.push('f7' + opreturn)
 
-          if(stderr) {
-              console.log('createToken failed: ', stderr)
-              reject(stderr)
-          }
+        console.warn('token create cliarg', args)
+        console.warn(args.join(' '))
 
-          if(stdout) {
-              console.log('Broadcasting tokencreate...')
-              broadcastTX(JSON.parse(stdout).hex).then(txid => {
-                  resolve(txid)
-              }).catch(e => {
-                  reject(e)
-              })
-          }
+        child_process.execFile(cli_path, args, (error, stdout, stderr) => {
 
-      })
-  })
+            if(stderr) {
+                console.log('createToken failed: ', stderr)
+                reject(stderr)
+            }
+
+            if (JSON.stringify(stdout).indexOf('Non-fungible data incorrect') > -1) {
+              console.log('createToken failed: ', stdout)
+              reject(stdout)
+            }
+
+            console.warn('daemon token create stdout', stdout)
+
+            if(stdout) {
+                console.log('Broadcasting tokencreate...')
+                broadcastTX(JSON.parse(stdout).hex).then(txid => {
+                    resolve(txid)
+                }).catch(e => {
+                    reject(e)
+                })
+            }
+
+        })
+    })
 }
 
 

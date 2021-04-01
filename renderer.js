@@ -592,17 +592,35 @@ $('#form-create-token-submit').submit(event => {
         return false
     }
 
+    let opretJSON = {};
+    if (!$('#nft-form').hasClass('hidden')) {
+      console.warn('create nft');
+
+      if ($('#input-create-token-nft-image').val().length > 0) {
+        opretJSON['image'] = $('#input-create-token-nft-image').val();
+      }
+      if ($('#input-create-token-nft-info').val().length > 0) {
+        opretJSON['info'] = $('#input-create-token-nft-info').val();
+      }
+
+      opretJSON['physical'] = $('#input-create-token-nft-physical').val();
+
+      console.warn(opretJSON);
+    } else {
+      console.warn('create regular token');
+    }
+
     // Create token
-    daemon.createToken(name, supply, description).then((createTokenTxid) => {
-        statusAlert(true, 'Created token ' + name + 
+    daemon.createToken(name, supply, description, !$('#nft-form').hasClass('hidden') ? opretJSON : null).then((createTokenTxid) => {
+        statusAlert(true, 'Created token ' + (!$('#nft-form').hasClass('hidden') ? '(NTF) ' : '') + name + 
                                 (description !== '' ? ('(' + description + ')') : '')
                                 + ' with ' +  supply + ' ' + daemon.getCoinName() + '\nTransaction ID: <a href="#" id="txid-link">' + createTokenTxid + '</a>')
         $('#txid-link').on('click', function(e) {
           openExtLink('http://www.atomicexplorer.com:10026/#/tokens/contract/' + daemon.getCoinName()  + '/' + createTokenTxid);
         })
-        addToHistory('Created token ' + name + 
+        addToHistory('Created token ' + (!$('#nft-form').hasClass('hidden') ? '(NTF) ' : '') + name + 
         (description !== '' ? ('(' + description + ')') : '')
-        + ' with ' +  supply + ' ' + daemon.getCoinName() + '\nTransaction ID: ' + createTokenTxid)
+        + ' with ' +  supply + ' ' + daemon.getCoinName() + '\nTransaction ID: ' + createTokenTxid + (!$('#nft-form').hasClass('hidden') ? '\nTransaction NFT data: ' + JSON.stringify(opretJSON) + '\n' : ''))
     }).catch(e => {
         statusAlert(false, 'Failed to create token: ' + e)
     })
@@ -939,3 +957,21 @@ $("#nav-explorer").click(function(e) {
   e.preventDefault()
   openExtLink('http://www.atomicexplorer.com:10026/#/tokens')
 })
+
+$('input[type=radio][name=create-token-type]').change(function() {
+  console.warn(this.value);
+
+  if (this.value === 'default') {
+    $('#nft-form').addClass('hidden');
+    $('#input-create-token-supply').val('');
+    $('#input-create-token-supply').attr('disabled', false);
+  } else {
+    $('#nft-form').removeClass('hidden');
+    $('#input-create-token-supply').attr('disabled', true);
+    $('#input-create-token-supply').val(1);
+  }
+});
+
+$('#input-create-token-nft-image').change(function() {
+  $("#input-create-token-nft-image-preview").attr('src', this.value);
+});

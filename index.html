@@ -427,6 +427,16 @@
                 <form id="form-create-token-submit">
                   <div class="modal-body">
                     <div class="form-group">
+                      <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                        <label class="btn btn-secondary active">
+                          <input type="radio" name="create-token-type" id="option1" autocomplete="off" value="default" checked> Default
+                        </label>
+                        <label class="btn btn-secondary">
+                          <input type="radio" name="create-token-type" id="option2" autocomplete="off" value="nft"> NFT
+                        </label>
+                      </div>
+                    </div>
+                    <div class="form-group">
                       <div class="input-group mb-3">
                         <div class="input-group-prepend">
                           <span class="input-group-text">Name</span>
@@ -444,6 +454,36 @@
                           <span class="input-group-text">Supply</span>
                         </div>
                         <input id="input-create-token-supply" type="number" min="0" step="any" class="form-control" placeholder="The amount you'll supply for this token, eg. 0.01" required>
+                      </div>
+                    </div>
+                    <!-- NFT form -->
+                    <div class="form-group hidden" id="nft-form">
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">Image</span>
+                        </div>
+                        <input type="text" class="form-control" id="input-create-token-nft-image"  placeholder="A link to hosted image file, eg. https://komodoplatform.com/test.png">
+                      </div>
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">Image Preview</span>
+                        </div>
+                        <img id="input-create-token-nft-image-preview" width="100" height="100" style="border: 1px solid rgba(0, 0, 0, 0.15);padding: 5px;">
+                      </div>
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">Additional info about NTF token</span>
+                        </div>
+                        <textarea class="form-control" id="input-create-token-nft-info" placeholder="Additional information about your NFT token"></textarea>
+                      </div>
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">Physical copy</span>
+                        </div>
+                        <select id="input-create-token-nft-physical">
+                          <option value="no" selected>No</option>
+                          <option value="yes">Yes</option>
+                        </select>
                       </div>
                     </div>
                   </div>
