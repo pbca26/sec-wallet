@@ -332,6 +332,12 @@ function init(pubkey) {
           $("#chain-selector").modal('hide');
 
           inputLock(true, 'Preparing the daemon.')
+
+          if (daemon.isNFTCoin()) {
+            $('#create-token-buttons').show();
+          } else {
+            $('#create-token-buttons').hide();
+          }
           
           // Launch daemon 
           daemon.startUp(pubkey).then(wallet => {
@@ -358,6 +364,7 @@ function init(pubkey) {
   
               // Set UI Values
               updateNewAddress(wallet.address)
+              $('#text-new-address').val(daemon.getKeyPair().address);
               $('#myccaddress').val(daemon.getKeyPair().CCaddress + '   |   ' + daemon.getKeyPair().pubkey);
               Promise.all([
                   updateBalance(),
@@ -399,14 +406,19 @@ $('#form-send').submit(event => {
     }
 
     // Send to address
-    daemon.sendToAddress(address, amount).then(() => {
+    daemon.sendToAddress(address, amount).then((txid) => {
         updateBalance()
 
         // Add it to transaction history
-        let transaction_text = addTransactionToHistory(address, amount, daemon.getCoinName())
+        let transaction_text = 'Sent ' + amount + ' ' + daemon.getCoinName() + ' to ' + address;
+        
+        addToHistory(transaction_text + '\nTransaction ID: ' + txid)
 
         // Update status text
-        statusAlert(true, transaction_text)
+        statusAlert(true, transaction_text + '\nTransaction ID: <a href="#" id="txid-link">' + txid + '</a>')
+        $('#txid-link').on('click', function(e) {
+          openExtLink('http://explorer.komodoplatform.com:20000/' + tokenid + '/transactions/' + txid + '/' + daemon.getCoinName());
+        })
     }).catch(e => {
         statusAlert(false, e)
     })
@@ -417,7 +429,7 @@ $('#form-send').submit(event => {
 
 $('#form-token-send').submit(event => {
     let token_line = $('#select-tokens option:selected').text()
-    let token_id = $('#select-tokens').val()
+    let tokenid = $('#select-tokens').val()
     let address = $('#input-token-address').val()
     let amount = parseInt($('#input-token-amount').val())
 
@@ -432,13 +444,17 @@ $('#form-token-send').submit(event => {
     }
 
     // Send to address
-    daemon.sendTokenToAddress(token_id, address, amount).then(txid => {
+    daemon.sendTokenToAddress(tokenid, address, amount).then(txid => {
         // Add it to transaction history
-        let transaction_text = addTransactionToHistory(address, amount, token_name, 
-                                            '\nTransaction ID: ' + txid) 
+        let transaction_text = 'Sent ' + amount + ' ' + token_name + ' to ' + address;
+        
+        addToHistory(transaction_text + '\nTransaction ID: ' + txid)
 
         // Update status text
-        statusAlert(true, transaction_text)
+        statusAlert(true, transaction_text + '\nTransaction ID: <a href="#" id="txid-link">' + txid + '</a>')
+        $('#txid-link').on('click', function(e) {
+          openExtLink('http://explorer.komodoplatform.com:20000/' + tokenid + '/transactions/' + txid + '/' + daemon.getCoinName());
+        })
     }).catch(e => {
         statusAlert(false, e)
     })
@@ -616,7 +632,7 @@ $('#form-create-token-submit').submit(event => {
                                 (description !== '' ? ('(' + description + ')') : '')
                                 + ' with ' +  supply + ' ' + daemon.getCoinName() + '\nTransaction ID: <a href="#" id="txid-link">' + createTokenTxid + '</a>')
         $('#txid-link').on('click', function(e) {
-          openExtLink('http://www.atomicexplorer.com:10026/#/tokens/contract/' + daemon.getCoinName()  + '/' + createTokenTxid);
+          openExtLink('http://explorer.komodoplatform.com:20000/' + createTokenTxid + '/transactions');
         })
         addToHistory('Created token ' + (!$('#nft-form').hasClass('hidden') ? '(NTF) ' : '') + name + 
         (description !== '' ? ('(' + description + ')') : '')
@@ -673,7 +689,7 @@ actions.forEach(action => {
             addToHistory('Created token order, ' + action + 'ing ' + supply + ' ' + name +
             ' for ' + stripZeros(price) + ' ' + daemon.getCoinName() + ' each. \nTransaction ID: ' + sellTokenOrderTxid)
             $('#txid-link').on('click', function(e) {
-              openExtLink('http://www.atomicexplorer.com:10026/#/tokens/transaction/' + daemon.getCoinName() + '/' + tokenid + '/' + sellTokenOrderTxid);
+              openExtLink('http://explorer.komodoplatform.com:20000/' + tokenid + '/transactions/' + sellTokenOrderTxid + '/' + daemon.getCoinName());
             })
         }).catch(e => {
             statusAlert(false, 'Could not create token trade order: ' + e)
@@ -825,11 +841,19 @@ $(document).on('click', '.button-token-cancel-order', function() {
     let txid = btn.attr("data-txid")
 
     daemon.cancelTokenOrder(type, tokenid, txid).then(cancel_order_id => {
-        statusAlert(true, addToHistory('Cancelling token order: "' + (type === 'ask' ? 'Sell' : 'Buy') + ' ' + 
-                    amount + ' ' + name + ' for ' + stripZeros(price) + ' ' + daemon.getCoinName() + ' each."' +
-                                        '\nTokenID: ' + tokenid + 
-                                        '\nOrder ID: ' + txid + 
-                                        '\nCancel Order ID: ' + cancel_order_id))
+      statusAlert(true, 'Cancelling token order: "' + (type === 'ask' ? 'Sell' : 'Buy') + ' ' + 
+        amount + ' ' + name + ' for ' + stripZeros(price) + ' ' + daemon.getCoinName() + ' each."' +
+                            '\nTokenID: ' + tokenid + 
+                            '\nOrder ID: ' + txid + 
+                            '\nCancel Order ID: ' + '<a href="#" id="txid-link">' + cancel_order_id + '</a>')
+        addToHistory('Cancelling token order: "' + (type === 'ask' ? 'Sell' : 'Buy') + ' ' + 
+          amount + ' ' + name + ' for ' + stripZeros(price) + ' ' + daemon.getCoinName() + ' each."' +
+                            '\nTokenID: ' + tokenid + 
+                            '\nOrder ID: ' + txid + 
+                            '\nCancel Order ID: ' + cancel_order_id)
+        $('#txid-link').on('click', function(e) {
+          openExtLink('http://explorer.komodoplatform.com:20000/' + tokenid + '/transactions/' + cancel_order_id + '/' + daemon.getCoinName());
+        })
     }).catch(e => {
         // Unknown error, no message
         if(e.indexOf('error code: -25') !== -1 || e.indexOf('error code: -26') !== -1) 
@@ -917,7 +941,7 @@ $('#form-token-fill-order-submit').submit(event => {
                   '\nOrder ID: ' + txid + 
                   '\nFill Order ID: ' + fill_order_id)
         $('#txid-link').on('click', function(e) {
-          openExtLink('http://www.atomicexplorer.com:10026/#/tokens/transactions/' + daemon.getCoinName() + '/' + tokenid);
+          openExtLink('http://explorer.komodoplatform.com:20000/' + tokenid + '/transactions/' + fill_order_id + '/' + daemon.getCoinName());
         })
     }).catch(e => {
         statusAlert(false, e)
@@ -955,7 +979,7 @@ function stripZeros(float) {
 
 $("#nav-explorer").click(function(e) {
   e.preventDefault()
-  openExtLink('http://www.atomicexplorer.com:10026/#/tokens')
+  openExtLink('http://explorer.komodoplatform.com:20000')
 })
 
 $('input[type=radio][name=create-token-type]').change(function() {
