@@ -245,3 +245,6 @@ body {
   top: 90%;
 }
 
+.hidden {
+  display: none;
+}

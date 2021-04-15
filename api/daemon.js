@@ -9,6 +9,8 @@ const platform = os.platform()
 const path = require('path');
 const fixPath = require('fix-path');
 
+const chains = require('./chains');
+
 let default_config;
 
 if (process.argv.indexOf('chain=rick') > -1) {
@@ -16,15 +18,29 @@ if (process.argv.indexOf('chain=rick') > -1) {
     bin_folder: getBinsFolder(),
     chain_name: 'RICK',
     coin_name: 'RICK',
-    chain_launch_params: '-ac_supply=90000000000 -ac_reward=100000000 -ac_cc=3 -ac_staked=10 -addnode=138.201.136.145 -addnode=95.217.44.58 -printtoconsole'
+    chain_launch_params: chains.RICK.params + ' -printtoconsole'
   }
 } else {
   default_config = {
     bin_folder: getBinsFolder(),
     chain_name: 'WSB',
     coin_name: 'WSB',
-    chain_launch_params: '-ac_supply=90000000000 -ac_cc=3 -ac_reward=100000000 -addnode=94.130.38.173 -addnode=178.63.47.105 -printtoconsole'
+    chain_launch_params: chains.WSB.params + ' -printtoconsole'
   }
+}
+
+function setChain(chain) {
+  default_config = {
+    bin_folder: getBinsFolder(),
+    chain_name: chain,
+    coin_name: chain,
+    chain_launch_params: chains[chain].params + ' -printtoconsole'
+  };
+
+  config.coin_name = chain;
+
+  console.warn('setChain config', default_config);
+  readConfig();
 }
 
 // Data
@@ -43,7 +59,7 @@ function to_cli_args(command) {
 function readConfig() {
     // Set default
     config = { ...default_config }
-
+    // FIXME
     const config_path = getKomodoFolder() + 'gui_config.json'
     try {
         let data = JSON.parse(fs.readFileSync(config_path))
@@ -86,6 +102,7 @@ function forceImportKey(keypair) {
       getAddressFromPubkey(keypair.pubkey).then(addr_info => {
           keypair.address = addr_info.address
           keypair.CCaddress = addr_info.CCaddress
+          keypair.pubkey = keypair.pubkey
 
           resolve({ 
               generated: false, 
@@ -105,6 +122,7 @@ function prepareDaemon(needs_keygen) {
                 getAddressFromPubkey(keypair.pubkey).then(addr_info => {
                     keypair.address = addr_info.address
                     keypair.CCaddress = addr_info.CCaddress
+                    keypair.pubkey = keypair.pubkey
 
                     resolve({ 
                         generated: needs_keygen, 
@@ -180,6 +198,7 @@ function launchDaemon(pubkey) {
                   getAddressFromPubkey(keypair.pubkey).then(addr_info => {
                     keypair.address = addr_info.address
                     keypair.CCaddress = addr_info.CCaddress
+                    keypair.pubkey = keypair.pubkey
 
                     resolve({ 
                         generated: false, 
@@ -213,12 +232,18 @@ function stopDaemon() {
             // Wait a bit and tell that it's done, not being sure
             let timeout = setTimeout(() => { resolve() }, 20000)
 
-            // If we get a close signal, that's it
-            komodod.on('close', code => {
-                clearTimeout(timeout)
-                
-                resolve()
-            })
+            if (komodod) {
+              // If we get a close signal, that's it
+              komodod.on('close', code => {
+                  clearTimeout(timeout)
+                  
+                  resolve()
+              })
+            } else {
+              clearTimeout(timeout)
+              
+              resolve()
+            }
             
         })
     })
@@ -226,6 +251,20 @@ function stopDaemon() {
 
 function getBalance() {
     return new Promise((resolve, reject) => {
+      if (chains[config.chain_name].isV2) {
+        child_process.execFile(cli_path, to_cli_args('tokenv2address'), (error, stdout, stderr) => {
+
+            if(stderr) {
+                console.log('getBalance failed: ', stderr)
+                reject(stderr)
+            }
+
+            if(stdout) {
+                resolve(JSON.parse(stdout)['mypk Normal Balance'])
+            }
+
+        })
+      } else {      
         child_process.execFile(cli_path, to_cli_args('getwalletinfo'), (error, stdout, stderr) => {
 
             if(stderr) {
@@ -238,6 +277,7 @@ function getBalance() {
             }
 
         })
+      }
     })
 }
 
@@ -261,7 +301,7 @@ function getNewAddress() {
 
 function getTokenBalance(id) {
     return new Promise((resolve, reject) => {
-        child_process.execFile(cli_path, to_cli_args('tokenbalance ' + id), (error, stdout, stderr) => {
+        child_process.execFile(cli_path, to_cli_args((chains[config.chain_name].isV2 ? 'tokenv2balance ' : 'tokenbalance ') + id), (error, stdout, stderr) => {
 
             if(stderr) {
                 console.log('getTokenBalance failed: ', stderr)
@@ -278,7 +318,7 @@ function getTokenBalance(id) {
 
 function getTokenName(id) {
     return new Promise((resolve, reject) => {
-        child_process.execFile(cli_path, to_cli_args('tokeninfo ' + id), (error, stdout, stderr) => {
+        child_process.execFile(cli_path, to_cli_args((chains[config.chain_name].isV2 ? 'tokenv2info ' : 'tokeninfo ') + id), (error, stdout, stderr) => {
 
             if(stderr) {
                 console.log('getTokenName failed: ', stderr)
@@ -296,7 +336,7 @@ function getTokenName(id) {
 
 function getTokenList() {
     return new Promise((resolve, reject) => {
-        child_process.execFile(cli_path, to_cli_args('tokenlist'), (error, stdout, stderr) => {
+        child_process.execFile(cli_path, to_cli_args(chains[config.chain_name].isV2 ? 'tokenv2list' : 'tokenlist'), (error, stdout, stderr) => {
 
             if(stderr) {
                 console.log('getTokenList failed: ', stderr)
@@ -328,7 +368,7 @@ function getTokenList() {
 
 function getTokenOrders() {
     return new Promise((resolve, reject) => {
-      child_process.execFile(cli_path, to_cli_args('mytokenorders'), (error1, stdout1, stderr1) => {
+      child_process.execFile(cli_path, to_cli_args(chains[config.chain_name].isV2 ? 'mytokenv2orders' : 'mytokenorders'), (error1, stdout1, stderr1) => {
         if(stderr1) {
             console.log('getTokenOrders failed (mytokenorders): ', stderr1)
             reject(stderr1)
@@ -338,7 +378,7 @@ function getTokenOrders() {
             let myorders = JSON.parse(stdout1)
             //console.warn('myorders', myorders);
 
-            child_process.execFile(cli_path, to_cli_args('tokenorders'), (error, stdout, stderr) => {
+            child_process.execFile(cli_path, to_cli_args(chains[config.chain_name].isV2 ? 'tokenv2orders' : 'tokenorders'), (error, stdout, stderr) => {
               
               if(stderr) {
                   console.log('getTokenOrders failed: ', stderr)
@@ -401,7 +441,7 @@ function importPrivKey(key) {
 
 function getAddressFromPubkey(pubkey) {
     return new Promise((resolve, reject) => {
-        child_process.execFile(cli_path, to_cli_args('tokenaddress ' + pubkey), (error, stdout, stderr) => {
+        child_process.execFile(cli_path, to_cli_args((chains[config.chain_name].isV2 ? 'tokenv2address ' : 'tokenaddress ') + pubkey), (error, stdout, stderr) => {
 
             if(stderr) {
                 console.log('getAddressFromPubkey failed: ', stderr)
@@ -411,7 +451,7 @@ function getAddressFromPubkey(pubkey) {
             if(stdout) {
                 let json = JSON.parse(stdout)
                 // console.log('getAddressFromPubkey success: ', json)
-                resolve({ address: json.myaddress, CCaddress: json['PubkeyCCaddress(Tokens)'], } )
+                resolve({ address: json['mypk Normal Address'], CCaddress: json[chains[config.chain_name].isV2 ? 'mypk Tokensv2 CC Address' : 'mypk Tokens CC Address'], } )
             }
 
         })
@@ -423,7 +463,7 @@ function getAddressFromPubkey(pubkey) {
 function sendToAddress(address, amount) {
     return new Promise((resolve, reject) => {
         console.log('Sending ' + amount + ' ' + getCoinName() + ' to ' + address)
-        const cli = child_process.execFile(cli_path, to_cli_args('sendtoaddress ' + address + ' ' + amount), (error, stdout, stderr) => {
+        const cli = child_process.execFile(cli_path, to_cli_args('sendtoaddress ' + address + ' ' + Number(amount)), (error, stdout, stderr) => {
 
             if(stderr) {
                 console.log('sendToAddress failed: ', stderr)
@@ -463,13 +503,15 @@ function broadcastTX(raw_tx) {
 function sendTokenToAddress(token_id, address, amount) {
     return new Promise((resolve, reject) => {
         console.log('Sending ' + amount + ' of token_id: ' + token_id + ' to ' + address)
-        child_process.execFile(cli_path, to_cli_args('tokentransfer ' + token_id + ' ' + address + ' ' + amount), (error, stdout, stderr) => {
+        child_process.execFile(cli_path, to_cli_args((chains[config.chain_name].isV2 ? 'tokenv2transfer ' : 'tokentransfer ') + token_id + ' ' + address + ' ' + Number(amount)), (error, stdout, stderr) => {
 
             if(stderr) {
                 console.log('sendTokenToAddress failed: ', stderr)
                 reject(stderr)
             }
 
+            console.warn('tokentransfer hex', stdout);
+            
             if(stdout) {
                 console.log('tokentransfer ' + address + ' ' + amount)
     
@@ -487,12 +529,22 @@ function sendTokenToAddress(token_id, address, amount) {
 
 
 
-function createToken(name, supply, description) {
+function createToken(name, supply, description, opreturn) {
     return new Promise((resolve, reject) => {
-        console.log('Creating token ' + name + ', supply: ' + supply + ' (' + (supply * 0.00000001) + ') ' + ' description: ' + description)
+        console.log('Creating token ' + name + ', supply: ' + supply + ' (' + Number(supply * 0.00000001).toFixed(8) + ') ' + ' description: ' + description)
         
-        let args = to_cli_args('tokencreate ' + name + ' ' + supply * 0.00000001)
-        if(description !== '') args.push('"' + description + '"')
+        if (opreturn && opreturn !== null) {
+          console.warn('Create token NFT', opreturn)
+          opreturn = Buffer.from(JSON.stringify(opreturn)).toString('hex')
+          console.warn('NTF opreturn hex', opreturn)
+        }
+
+        let args = to_cli_args((chains[config.chain_name].isV2 ? 'tokenv2create ' : 'tokencreate ') + name + ' ' + Number(supply * 0.00000001).toFixed(8))
+        if(description !== '') args.push(description)
+        if(opreturn && opreturn !== null) args.push('f7' + opreturn)
+
+        console.warn('token create cliarg', args)
+        console.warn(args.join(' '))
 
         child_process.execFile(cli_path, args, (error, stdout, stderr) => {
 
@@ -500,6 +552,13 @@ function createToken(name, supply, description) {
                 console.log('createToken failed: ', stderr)
                 reject(stderr)
             }
+
+            if (JSON.stringify(stdout).indexOf('Non-fungible data incorrect') > -1) {
+              console.log('createToken failed: ', stdout)
+              reject(stdout)
+            }
+
+            console.warn('daemon token create stdout', stdout)
 
             if(stdout) {
                 console.log('Broadcasting tokencreate...')
@@ -519,8 +578,8 @@ function createTokenTradeOrder(action, supply, tokenid, price) {
     return new Promise((resolve, reject) => {
         console.log('Creating token buy order supply:' + supply + ', tokenid: ' + tokenid + ', price: ' + price)
         
-        child_process.execFile(cli_path, to_cli_args('token' + (action === 'buy' ? 'bid' : 'ask')
-                                            + ' ' + supply + ' ' + tokenid + ' ' + price), (error, stdout, stderr) => {
+        child_process.execFile(cli_path, to_cli_args((chains[config.chain_name].isV2 ? 'tokenv2' : 'token') + (action === 'buy' ? 'bid' : 'ask')
+                                            + ' ' + Number(supply) + ' ' + tokenid + ' ' + Number(price)), (error, stdout, stderr) => {
 
             if(stderr) {
                 console.log('createTokenTradeOrder failed: ', stderr)
@@ -544,8 +603,8 @@ function fillTokenOrder(func, tokenid, txid, count) {
     return new Promise((resolve, reject) => {
         console.log('Filling order token order:' + func + ', tokenid: ' + tokenid + ', txid: ' + txid + ' count: ' + count)
         
-        child_process.execFile(cli_path, to_cli_args('tokenfill' + (func === 'buy' ? 'ask' : 'bid')
-                                            + ' ' + tokenid + ' ' + txid + ' ' + count), (error, stdout, stderr) => {
+        child_process.execFile(cli_path, to_cli_args((chains[config.chain_name].isV2 ? 'tokenv2fill' : 'tokenfill') + (func === 'buy' ? 'ask' : 'bid')
+                                            + ' ' + tokenid + ' ' + txid + ' ' + Number(count)), (error, stdout, stderr) => {
 
             if(stderr) {
                 console.log('fillTokenOrder failed: ', stderr)
@@ -569,7 +628,7 @@ function cancelTokenOrder(action, tokenid, txid) {
     return new Promise((resolve, reject) => {
         console.log('Cancelling order token order:' + action + ', tokenid: ' + tokenid + ', txid: ' + txid)
         
-        const cli = child_process.execFile(cli_path, to_cli_args('tokencancel' + action + ' ' + tokenid + ' ' + txid), (error, stdout, stderr) => {
+        const cli = child_process.execFile(cli_path, to_cli_args((chains[config.chain_name].isV2 ? 'tokenv2cancel' : 'tokencancel') + action + ' ' + tokenid + ' ' + txid), (error, stdout, stderr) => {
 
             if(stderr) {
                 console.log('cancelTokenOrder failed: ', stderr)
@@ -592,6 +651,10 @@ function cancelTokenOrder(action, tokenid, txid) {
 
 function getCoinName() {
     return config.coin_name
+}
+
+function isNFTCoin() {
+  return chains[config.chain_name].NFT
 }
 
 function getChainName() {
@@ -638,6 +701,7 @@ module.exports = {
     getBalance,
     getChainName,
     getCoinName,
+    isNFTCoin,
     getKomodoFolder,
     sendToAddress,
     getNewAddress,
@@ -651,5 +715,6 @@ module.exports = {
     cancelTokenOrder,
     readConfig,
     forceImportKey,
-    chainName: default_config.chain_name,
+    chains,
+    setChain,
 } 

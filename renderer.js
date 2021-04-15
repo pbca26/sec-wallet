@@ -309,45 +309,76 @@ $('#form-submit-password').submit(event => {
 
 function init(pubkey) {
     return new Promise((resolve, reject) => {
-        inputLock(true, 'Preparing the daemon.')
+      console.warn('init');
 
-        // Launch daemon 
-        daemon.startUp(pubkey).then(wallet => {
-            // Store the key
-            store.set('pubkey', wallet.pubkey)
+      $("#chain-selector").modal({
+        backdrop: "static", // Remove ability to close modal with click
+        keyboard: false, // Remove option to close with keyboard
+        show: true // Display loader!
+      })
 
-            // Save the new pubkey if generated for first time
-            if(wallet.generated) {
-                store.set('generated_privkey', wallet.privkey)
-                store.set('generated_pubkey', wallet.pubkey)
+      var $secondChoice = $("#chain-selector-dropdown");
+      $secondChoice.empty();
+      $secondChoice.append("<option>None</option>");
+      $.each(Object.keys(daemon.chains), function(index, value) {
+        $secondChoice.append("<option>" + value + "</option>");
+      });
 
-                console.log('Firstprivkey : ', store.get('first_privkey'))
-                if(store.get('first_privkey') === '') {
-                    store.set('first_privkey', wallet.privkey)
-                    store.set('first_pubkey', wallet.pubkey)
-                }
-            }
+      $('#chain-selector-dropdown').on('change', function() {
+        console.warn(this.value);
+        
+        if (this.value !== 'None') {
+          daemon.setChain(this.value);
+          $("#chain-selector").modal('hide');
 
-            // // Add block for test
-            // let transactions = []
-            // for(let i = 0; i < 500; ++i)
-            //     transactions.push(daemon.sendToAddress('RKSXk8CSb1tR1WBfx4z4xdedYLHPcPTFTx', 0.01))
-            // Promise.all(transactions, () => { console.log('Sent all') })
+          inputLock(true, 'Preparing the daemon.')
 
-            // Set UI Values
-            updateNewAddress(wallet.address)
-            $('#myccaddress').val(daemon.getKeyPair().CCaddress);
-            Promise.all([
-                updateBalance(),
-                updateTokenLists(),
-                updateTokenOrders()
-            ]).then(() => {
-                // Unlock input
-                inputLock(false)
-                
-                resolve()
-            })
-        }) 
+          if (daemon.isNFTCoin()) {
+            $('#create-token-buttons').show();
+          } else {
+            $('#create-token-buttons').hide();
+          }
+          
+          // Launch daemon 
+          daemon.startUp(pubkey).then(wallet => {
+              // Store the key
+              store.set('pubkey', wallet.pubkey)
+  
+              // Save the new pubkey if generated for first time
+              if(wallet.generated) {
+                  store.set('generated_privkey', wallet.privkey)
+                  store.set('generated_pubkey', wallet.pubkey)
+  
+                  console.log('Firstprivkey : ', store.get('first_privkey'))
+                  if(store.get('first_privkey') === '') {
+                      store.set('first_privkey', wallet.privkey)
+                      store.set('first_pubkey', wallet.pubkey)
+                  }
+              }
+  
+              // // Add block for test
+              // let transactions = []
+              // for(let i = 0; i < 500; ++i)
+              //     transactions.push(daemon.sendToAddress('RKSXk8CSb1tR1WBfx4z4xdedYLHPcPTFTx', 0.01))
+              // Promise.all(transactions, () => { console.log('Sent all') })
+  
+              // Set UI Values
+              updateNewAddress(wallet.address)
+              $('#text-new-address').val(daemon.getKeyPair().address);
+              $('#myccaddress').val(daemon.getKeyPair().CCaddress + '   |   ' + daemon.getKeyPair().pubkey);
+              Promise.all([
+                  updateBalance(),
+                  updateTokenLists(),
+                  updateTokenOrders()
+              ]).then(() => {
+                  // Unlock input
+                  inputLock(false)
+                  
+                  resolve()
+              })
+          })
+        }
+      });
     })
 }
 
@@ -375,14 +406,19 @@ $('#form-send').submit(event => {
     }
 
     // Send to address
-    daemon.sendToAddress(address, amount).then(() => {
+    daemon.sendToAddress(address, amount).then((txid) => {
         updateBalance()
 
         // Add it to transaction history
-        let transaction_text = addTransactionToHistory(address, amount, daemon.getCoinName())
+        let transaction_text = 'Sent ' + amount + ' ' + daemon.getCoinName() + ' to ' + address;
+        
+        addToHistory(transaction_text + '\nTransaction ID: ' + txid)
 
         // Update status text
-        statusAlert(true, transaction_text)
+        statusAlert(true, transaction_text + '\nTransaction ID: <a href="#" id="txid-link">' + txid + '</a>')
+        $('#txid-link').on('click', function(e) {
+          openExtLink('http://explorer.komodoplatform.com:20000/tokens/' + tokenid + '/transactions/' + txid + '/' + daemon.getCoinName());
+        })
     }).catch(e => {
         statusAlert(false, e)
     })
@@ -393,7 +429,7 @@ $('#form-send').submit(event => {
 
 $('#form-token-send').submit(event => {
     let token_line = $('#select-tokens option:selected').text()
-    let token_id = $('#select-tokens').val()
+    let tokenid = $('#select-tokens').val()
     let address = $('#input-token-address').val()
     let amount = parseInt($('#input-token-amount').val())
 
@@ -408,13 +444,17 @@ $('#form-token-send').submit(event => {
     }
 
     // Send to address
-    daemon.sendTokenToAddress(token_id, address, amount).then(txid => {
+    daemon.sendTokenToAddress(tokenid, address, amount).then(txid => {
         // Add it to transaction history
-        let transaction_text = addTransactionToHistory(address, amount, token_name, 
-                                            '\nTransaction ID: ' + txid) 
+        let transaction_text = 'Sent ' + amount + ' ' + token_name + ' to ' + address;
+        
+        addToHistory(transaction_text + '\nTransaction ID: ' + txid)
 
         // Update status text
-        statusAlert(true, transaction_text)
+        statusAlert(true, transaction_text + '\nTransaction ID: <a href="#" id="txid-link">' + txid + '</a>')
+        $('#txid-link').on('click', function(e) {
+          openExtLink('http://explorer.komodoplatform.com:20000/tokens/' + tokenid + '/transactions/' + txid + '/' + daemon.getCoinName());
+        })
     }).catch(e => {
         statusAlert(false, e)
     })
@@ -568,17 +608,35 @@ $('#form-create-token-submit').submit(event => {
         return false
     }
 
+    let opretJSON = {};
+    if (!$('#nft-form').hasClass('hidden')) {
+      console.warn('create nft');
+
+      if ($('#input-create-token-nft-image').val().length > 0) {
+        opretJSON['image'] = $('#input-create-token-nft-image').val();
+      }
+      if ($('#input-create-token-nft-info').val().length > 0) {
+        opretJSON['info'] = $('#input-create-token-nft-info').val();
+      }
+
+      opretJSON['physical'] = $('#input-create-token-nft-physical').val();
+
+      console.warn(opretJSON);
+    } else {
+      console.warn('create regular token');
+    }
+
     // Create token
-    daemon.createToken(name, supply, description).then((createTokenTxid) => {
-        statusAlert(true, 'Created token ' + name + 
+    daemon.createToken(name, supply, description, !$('#nft-form').hasClass('hidden') ? opretJSON : null).then((createTokenTxid) => {
+        statusAlert(true, 'Created token ' + (!$('#nft-form').hasClass('hidden') ? '(NTF) ' : '') + name + 
                                 (description !== '' ? ('(' + description + ')') : '')
                                 + ' with ' +  supply + ' ' + daemon.getCoinName() + '\nTransaction ID: <a href="#" id="txid-link">' + createTokenTxid + '</a>')
         $('#txid-link').on('click', function(e) {
-          openExtLink('http://www.atomicexplorer.com:10026/#/tokens/contract/' + daemon.chainName + '/' + createTokenTxid);
+          openExtLink('http://explorer.komodoplatform.com:20000/tokens/' + createTokenTxid + '/transactions/' + daemon.getCoinName());
         })
-        addToHistory('Created token ' + name + 
+        addToHistory('Created token ' + (!$('#nft-form').hasClass('hidden') ? '(NTF) ' : '') + name + 
         (description !== '' ? ('(' + description + ')') : '')
-        + ' with ' +  supply + ' ' + daemon.getCoinName() + '\nTransaction ID: ' + createTokenTxid)
+        + ' with ' +  supply + ' ' + daemon.getCoinName() + '\nTransaction ID: ' + createTokenTxid + (!$('#nft-form').hasClass('hidden') ? '\nTransaction NFT data: ' + JSON.stringify(opretJSON) + '\n' : ''))
     }).catch(e => {
         statusAlert(false, 'Failed to create token: ' + e)
     })
@@ -631,7 +689,7 @@ actions.forEach(action => {
             addToHistory('Created token order, ' + action + 'ing ' + supply + ' ' + name +
             ' for ' + stripZeros(price) + ' ' + daemon.getCoinName() + ' each. \nTransaction ID: ' + sellTokenOrderTxid)
             $('#txid-link').on('click', function(e) {
-              openExtLink('http://www.atomicexplorer.com:10026/#/tokens/transaction/' + daemon.chainName + '/' + tokenid + '/' + sellTokenOrderTxid);
+              openExtLink('http://explorer.komodoplatform.com:20000/tokens/' + tokenid + '/transactions/' + sellTokenOrderTxid + '/' + daemon.getCoinName());
             })
         }).catch(e => {
             statusAlert(false, 'Could not create token trade order: ' + e)
@@ -783,11 +841,19 @@ $(document).on('click', '.button-token-cancel-order', function() {
     let txid = btn.attr("data-txid")
 
     daemon.cancelTokenOrder(type, tokenid, txid).then(cancel_order_id => {
-        statusAlert(true, addToHistory('Cancelling token order: "' + (type === 'ask' ? 'Sell' : 'Buy') + ' ' + 
-                    amount + ' ' + name + ' for ' + stripZeros(price) + ' ' + daemon.getCoinName() + ' each."' +
-                                        '\nTokenID: ' + tokenid + 
-                                        '\nOrder ID: ' + txid + 
-                                        '\nCancel Order ID: ' + cancel_order_id))
+      statusAlert(true, 'Cancelling token order: "' + (type === 'ask' ? 'Sell' : 'Buy') + ' ' + 
+        amount + ' ' + name + ' for ' + stripZeros(price) + ' ' + daemon.getCoinName() + ' each."' +
+                            '\nTokenID: ' + tokenid + 
+                            '\nOrder ID: ' + txid + 
+                            '\nCancel Order ID: ' + '<a href="#" id="txid-link">' + cancel_order_id + '</a>')
+        addToHistory('Cancelling token order: "' + (type === 'ask' ? 'Sell' : 'Buy') + ' ' + 
+          amount + ' ' + name + ' for ' + stripZeros(price) + ' ' + daemon.getCoinName() + ' each."' +
+                            '\nTokenID: ' + tokenid + 
+                            '\nOrder ID: ' + txid + 
+                            '\nCancel Order ID: ' + cancel_order_id)
+        $('#txid-link').on('click', function(e) {
+          openExtLink('http://explorer.komodoplatform.com:20000/tokens/' + tokenid + '/transactions/' + cancel_order_id + '/' + daemon.getCoinName());
+        })
     }).catch(e => {
         // Unknown error, no message
         if(e.indexOf('error code: -25') !== -1 || e.indexOf('error code: -26') !== -1) 
@@ -875,7 +941,7 @@ $('#form-token-fill-order-submit').submit(event => {
                   '\nOrder ID: ' + txid + 
                   '\nFill Order ID: ' + fill_order_id)
         $('#txid-link').on('click', function(e) {
-          openExtLink('http://www.atomicexplorer.com:10026/#/tokens/transactions/' + daemon.chainName + '/' + tokenid);
+          openExtLink('http://explorer.komodoplatform.com:20000/tokens/' + tokenid + '/transactions/' + fill_order_id + '/' + daemon.getCoinName());
         })
     }).catch(e => {
         statusAlert(false, e)
@@ -913,5 +979,23 @@ function stripZeros(float) {
 
 $("#nav-explorer").click(function(e) {
   e.preventDefault()
-  openExtLink('http://www.atomicexplorer.com:10026/#/tokens')
+  openExtLink('http://explorer.komodoplatform.com:20000')
 })
+
+$('input[type=radio][name=create-token-type]').change(function() {
+  console.warn(this.value);
+
+  if (this.value === 'default') {
+    $('#nft-form').addClass('hidden');
+    $('#input-create-token-supply').val('');
+    $('#input-create-token-supply').attr('disabled', false);
+  } else {
+    $('#nft-form').removeClass('hidden');
+    $('#input-create-token-supply').attr('disabled', true);
+    $('#input-create-token-supply').val(1);
+  }
+});
+
+$('#input-create-token-nft-image').change(function() {
+  $("#input-create-token-nft-image-preview").attr('src', this.value);
+});
